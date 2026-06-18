@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/fach_provider.dart';
-import '../../models/fachrichtung.dart'; // <-- Dieser Import ist wichtig!
+import '../../models/fachrichtung.dart';
 import '../themen/themen_screen.dart';
+import '../admin/admin_dashboard_screen.dart'; // <-- WICHTIG: Hier ist dein neuer Admin-Screen verlinkt!
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -13,7 +14,16 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Fachinformatiker Trainer'),
+        // HIER WAR DER FEHLER: Kein 'const' vor GestureDetector oder MaterialPageRoute!
+        title: GestureDetector(
+          onLongPress: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
+            );
+          },
+          child: const Text('Fachinformatiker Trainer'),
+        ),
         backgroundColor: Colors.blueAccent,
         foregroundColor: Colors.white,
       ),
@@ -45,7 +55,6 @@ class DashboardScreen extends ConsumerWidget {
 
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),
-                        // KORREKTUR: Wir übergeben das ganze 'fach'-Objekt statt der einzelnen Strings
                         child: _buildFachrichtungCard(context, fach, icon),
                       );
                     },
@@ -59,7 +68,6 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  // Diese Funktion erwartet das gesamte 'Fachrichtung'-Objekt
   Widget _buildFachrichtungCard(BuildContext context, Fachrichtung fach, IconData icon) {
     return Card(
       elevation: 4,
