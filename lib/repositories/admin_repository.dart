@@ -2,7 +2,22 @@ import '../core/database/database_service.dart';
 
 class AdminRepository {
   
-  // Funktion: Neues Themengebiet (Oberthema) in die Datenbank schreiben
+  // ==========================================
+  // NEU: Eine komplette Fachrichtung anlegen
+  // ==========================================
+  Future<void> addFachrichtung(String kuerzel, String name) async {
+    final db = await DatabaseService.instance.database;
+    await db.insert('fachrichtung', {
+      'kuerzel': kuerzel,
+      'name': name,
+      'beschreibung': 'Manuell hinzugefügte Fachrichtung',
+      'icon_name': 'school', // Standard-Icon
+    });
+  }
+
+  // ==========================================
+  // Neues Themengebiet (Oberthema) anlegen
+  // ==========================================
   Future<void> addThemengebiet(int fachrichtungId, String name) async {
     final db = await DatabaseService.instance.database;
     
@@ -14,7 +29,9 @@ class AdminRepository {
     });
   }
 
-  // NEU: Komplette Frage mit Antworten speichern
+  // ==========================================
+  // Komplette Frage mit Antworten speichern
+  // ==========================================
   Future<void> addFrageMitAntworten({
     required int themengebietId,
     required String frageText,
@@ -35,14 +52,44 @@ class AdminRepository {
       'schwierigkeit': 1,
     });
 
-    // 2. Die dazugehörigen Antworten anlegen
-    for (var i = 0; i < antworten.length; i++) {
-      await db.insert('antwort_option', {
-        'frage_id': frageId,
-        'text': antworten[i]['text'],
-        'ist_korrekt': antworten[i]['ist_korrekt'],
-        'reihenfolge': i,
-      });
+    // 2. Die dazugehörigen Antworten anlegen (NUR bei Multiple Choice)
+    if (typ == 'multiple_choice') {
+      for (var i = 0; i < antworten.length; i++) {
+        await db.insert('antwort_option', {
+          'frage_id': frageId,
+          'text': antworten[i]['text'],
+          'ist_korrekt': antworten[i]['ist_korrekt'],
+          'reihenfolge': i,
+        });
+      }
     }
+  }
+
+  // ==========================================
+  // Alle Fragen eines Themengebiets löschen
+  // ==========================================
+  Future<void> clearThemengebietFragen(int themengebietId) async {
+    final db = await DatabaseService.instance.database;
+    
+    await db.delete(
+      'antwort_option',
+      where: 'frage_id IN (SELECT id FROM frage WHERE themengebiet_id = ?)',
+      whereArgs: [themengebietId],
+    );
+    
+    await db.delete(
+      'frage',
+      where: 'themengebiet_id = ?',
+      whereArgs: [themengebietId],
+    );
+  }
+
+  // ==========================================
+  // Eine einzelne Frage anhand ihrer ID löschen
+  // ==========================================
+  Future<void> deleteFrage(int frageId) async {
+    final db = await DatabaseService.instance.database;
+    await db.delete('antwort_option', where: 'frage_id = ?', whereArgs: [frageId]);
+    await db.delete('frage', where: 'id = ?', whereArgs: [frageId]);
   }
 }
