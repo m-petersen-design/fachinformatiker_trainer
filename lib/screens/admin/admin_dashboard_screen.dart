@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:file_selector/file_selector.dart';
@@ -19,13 +18,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   final _themaFormKey = GlobalKey<FormState>();
   final _themaController = TextEditingController();
   
-  // Controller für neue Fachrichtung
   final _fachFormKey = GlobalKey<FormState>();
   final _fachKuerzelController = TextEditingController();
   final _fachNameController = TextEditingController();
 
   Fachrichtung? _selectedFachrichtung;
-  Themengebiet? _selectedThema; // NEU: Damit der Import weiß, wohin genau!
+  Themengebiet? _selectedThema;
   
   List<Fachrichtung> _fachrichtungen = [];
   List<Themengebiet> _themen = [];
@@ -55,9 +53,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     });
   }
 
-  // ==========================================
-  // NEU: FACHRICHTUNG ANLEGEN (Uni / Berufsschule)
-  // ==========================================
   Future<void> _fachrichtungSpeichern() async {
     if (_fachFormKey.currentState!.validate()) {
       final adminRepo = AdminRepository();
@@ -72,14 +67,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         );
         _fachKuerzelController.clear();
         _fachNameController.clear();
-        _ladeFachrichtungen(); // Dropdown aktualisieren
+        _ladeFachrichtungen();
       }
     }
   }
 
-  // ==========================================
-  // THEMA ANLEGEN
-  // ==========================================
   Future<void> _themaSpeichern() async {
     if (_themaFormKey.currentState!.validate() && _selectedFachrichtung != null) {
       final adminRepo = AdminRepository();
@@ -89,41 +81,63 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           const SnackBar(content: Text('✅ Neues Thema erfolgreich angelegt!'), backgroundColor: Colors.green)
         );
         _themaController.clear(); 
-        _ladeThemen(_selectedFachrichtung!.id); // Dropdowns aktualisieren
+        _ladeThemen(_selectedFachrichtung!.id);
       }
     }
   }
 
   // ==========================================
-  // IMPORTIERT JETZT KORREKT INS THEMA!
+  // HYBRID-IMPORT: JSON-ID hat Vorrang, Dropdown ist nur Fallback
   // ==========================================
-  Future<void> _importiereKlausur(List<Map<String, dynamic>> klausurDaten) async {
-    // DER ENTSCHEIDENDE FIX: Wir prüfen auf das THEMA, nicht auf die Fachrichtung
-    if (_selectedThema == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('❌ Bitte wähle zuerst ein Themengebiet im Dropdown aus!'), backgroundColor: Colors.red)
-      );
-      return;
-    }
-
+  Future<void> _importiereKlausur(List<dynamic> klausurDatenRaw) async {
     final adminRepo = AdminRepository();
     int importierteFragen = 0;
-    final zielThemengebietId = _selectedThema!.id; // HIER IST DER FIX!
+    int uebersprungeneFragen = 0;
 
-    for (var frage in klausurDaten) {
+    for (var rawFrage in klausurDatenRaw) {
+      final Map<String, dynamic> frage = Map<String, dynamic>.from(rawFrage);
+      
+      int? finaleId;
+      
+      // 1. Prio: Hat das JSON eine feste, gültige ID (> 0)?
+      if (frage['themengebiet_id'] != null && frage['themengebiet_id'] is int && frage['themengebiet_id'] > 0) {
+        finaleId = frage['themengebiet_id']; 
+      } 
+      // 2. Prio: Wenn das JSON KEINE ID hat (0 oder fehlt), schau nach dem Dropdown-Ordner
+      else if (_selectedThema != null) {
+        finaleId = _selectedThema!.id; 
+      }
+
+      // Wenn beides nicht existiert, überspringen wir die Frage sicher
+      if (finaleId == null) {
+        uebersprungeneFragen++;
+        continue;
+      }
+
+      List<Map<String, dynamic>> saubereAntworten = [];
+      if (frage['antworten'] != null) {
+        saubereAntworten = List<dynamic>.from(frage['antworten'])
+            .map((e) => Map<String, dynamic>.from(e))
+            .toList();
+      }
+
       await adminRepo.addFrageMitAntworten(
-        themengebietId: zielThemengebietId,
+        themengebietId: finaleId,
         frageText: frage['frage_text'],
         typ: frage['typ'] ?? 'multiple_choice',
         erklaerung: frage['erklaerung'],
-        antworten: frage['antworten'] != null ? List<Map<String, dynamic>>.from(frage['antworten']) : [],
+        antworten: saubereAntworten,
       );
       importierteFragen++;
     }
 
     if (mounted) {
+      String meldung = '🎉 $importierteFragen Fragen erfolgreich importiert!';
+      if (uebersprungeneFragen > 0) {
+        meldung += ' ($uebersprungeneFragen übersprungen, da keine ID im JSON und kein Ziel-Ordner gewählt war).';
+      }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('🎉 $importierteFragen Fragen in "${_selectedThema!.name}" importiert!'), backgroundColor: Colors.purple)
+        SnackBar(content: Text(meldung), backgroundColor: Colors.purple, duration: const Duration(seconds: 4))
       );
     }
   }
@@ -140,9 +154,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 
-                // ----------------------------------------------------
-                // BEREICH 1: NEUE FACHRICHTUNG (Uni / Berufsschule)
-                // ----------------------------------------------------
                 Card(
                   elevation: 4,
                   child: Padding(
@@ -189,9 +200,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // ----------------------------------------------------
-                // BEREICH 2: THEMA ANLEGEN & JSON IMPORT
-                // ----------------------------------------------------
                 Card(
                   elevation: 4,
                   child: Padding(
@@ -239,13 +247,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                             child: Divider(thickness: 2),
                           ),
 
-                          const Text('Ziel-Ordner für den JSON-Import auswählen:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple)),
+                          const Text('Ziel-Ordner (Fallback) für JSON-Import:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple)),
                           const SizedBox(height: 10),
                           
-                          // HIER WÄHLT MAN JETZT DEN ZIELORDNER FÜR DAS JSON
                           DropdownButtonFormField<Themengebiet>(
                             value: _selectedThema,
-                            decoration: const InputDecoration(labelText: 'Ziel-Thema (z.B. Mathe)', border: OutlineInputBorder()),
+                            decoration: const InputDecoration(labelText: 'Ziel-Thema auswählen (Optional)', border: OutlineInputBorder()),
                             items: _themen.map((thema) => DropdownMenuItem(value: thema, child: Text(thema.name))).toList(),
                             onChanged: (value) {
                               setState(() => _selectedThema = value);
@@ -256,20 +263,28 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                           ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), backgroundColor: Colors.purple[700], foregroundColor: Colors.white),
                             icon: const Icon(Icons.file_upload),
-                            label: const Text('Fragen (JSON) in diesen Ordner importieren', style: TextStyle(fontSize: 16)),
+                            label: const Text('Fragen (JSON) importieren', style: TextStyle(fontSize: 16)),
                             onPressed: () async {
-                              if (_selectedThema == null) {
-                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Bitte wähle zuerst oben ein Ziel-Thema aus!'), backgroundColor: Colors.red));
-                                return;
-                              }
+                              // DIE SPERRE IST HIER JETZT KOMPLETT WEG!
                               try {
                                 const XTypeGroup typeGroup = XTypeGroup(label: 'JSON', extensions: <String>['json']);
                                 final XFile? file = await openFile(acceptedTypeGroups: <XTypeGroup>[typeGroup]);
 
                                 if (file != null) {
                                   String jsonString = await file.readAsString();
-                                  List<dynamic> jsonData = jsonDecode(jsonString);
-                                  await _importiereKlausur(List<Map<String, dynamic>>.from(jsonData));
+                                  dynamic decodedData = jsonDecode(jsonString);
+                                  
+                                  List<dynamic> rawList = [];
+                                  
+                                  if (decodedData is List) {
+                                    rawList = decodedData;
+                                  } else if (decodedData is Map && decodedData.containsKey('fragen')) {
+                                    rawList = decodedData['fragen'];
+                                  } else {
+                                    throw Exception("Unbekanntes JSON-Format. Erwarte eine Liste [ ... ]");
+                                  }
+
+                                  await _importiereKlausur(rawList);
                                 }
                               } catch (e) {
                                 if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Fehler: $e'), backgroundColor: Colors.red));

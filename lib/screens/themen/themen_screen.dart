@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/fach_provider.dart';
 import '../../models/fachrichtung.dart'; 
-import '../quiz/quiz_screen.dart'; // <-- Import ist schon da, super!
+import '../quiz/quiz_screen.dart';
 
 class ThemenScreen extends ConsumerWidget {
   final Fachrichtung fachrichtung;
@@ -45,13 +45,16 @@ class ThemenScreen extends ConsumerWidget {
                   trailing: const Icon(Icons.play_arrow, color: Colors.green, size: 30),
                   
                   // ==========================================
-                  // HIER IST DIE ÄNDERUNG:
+                  // KORRIGIERTER AUFRUF:
                   // ==========================================
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => QuizScreen(thema: thema),
+                        builder: (context) => QuizScreen(
+                          themengebietId: thema.id, 
+                          themengebietName: thema.name,
+                        ),
                       ),
                     );
                   },
