@@ -1,0 +1,13 @@
+{
+  "name": "Flutter Project",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Dart-Code.flutter",
+        "Dart-Code.dart-code"
+      ]
+    }
+  },
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y curl git unzip xz-utils zip libglu1-mesa && git clone https://github.com/flutter/flutter.git -b 3.24.0 $HOME/flutter && echo 'export PATH=$HOME/flutter/bin:$PATH' >> ~/.bashrc"
+}

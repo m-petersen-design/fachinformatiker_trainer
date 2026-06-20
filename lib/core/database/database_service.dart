@@ -1,7 +1,8 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
 class DatabaseService {
   DatabaseService._();
@@ -11,13 +12,14 @@ class DatabaseService {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    // Wir erzwingen v6, um eine garantiert saubere Tabelle aufzubauen!
     _database = await _initDB('fachinformatiker_v6.db');
     return _database!;
   }
 
   Future<Database> _initDB(String filePath) async {
-    if (Platform.isWindows || Platform.isLinux) {
+    if (kIsWeb) {
+      databaseFactory = databaseFactoryFfiWeb;
+    } else {
       sqfliteFfiInit();
       databaseFactory = databaseFactoryFfi;
     }
