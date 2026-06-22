@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'screens/dashboard/dashboard_screen.dart';
 
 void main() {
@@ -10,18 +11,18 @@ class FachinformatikerTrainerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Generiere ein sauberes TextTheme mit Poppins
+    final TextTheme poppinsTheme = GoogleFonts.poppinsTextTheme().apply(
+      bodyColor: Colors.white,
+      displayColor: Colors.white,
+    );
+
     return MaterialApp(
       title: 'Fachinformatiker Trainer',
       debugShowCheckedModeBanner: false,
-      
-      // =======================================================================
-      // NEUES GLOBAL MODERN DARK THEME
-      // =======================================================================
-      themeMode: ThemeMode.dark, // Zwinge Dark Mode
+      themeMode: ThemeMode.dark, 
       darkTheme: ThemeData(
         useMaterial3: true,
-        
-        // --- 1. FARBPALETTE DEFINIEREN ---
         scaffoldBackgroundColor: const Color(0xFF121419),
         colorScheme: const ColorScheme.dark(
           primary: Color(0xFF00E5FF),
@@ -32,36 +33,29 @@ class FachinformatikerTrainerApp extends StatelessWidget {
           onSurface: Colors.white,
         ),
         
-        // --- 2. GLOBALER TEXT LOOK ---
-        textTheme: const TextTheme(
-          displayLarge: TextStyle(fontSize: 32.0, fontWeight: FontWeight.bold, color: Colors.white),
-          titleLarge: TextStyle(fontSize: 22.0, fontWeight: FontWeight.w600, color: Colors.white),
-          titleMedium: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500, color: Colors.white),
-          bodyLarge: TextStyle(fontSize: 16.0, color: Colors.white70),
-          bodyMedium: TextStyle(fontSize: 14.0, color: Colors.white70),
+        // DAS NEUE GLOBALE FONT-THEME
+        textTheme: poppinsTheme.copyWith(
+          displayLarge: poppinsTheme.displayLarge?.copyWith(fontSize: 32.0, fontWeight: FontWeight.bold),
+          titleLarge: poppinsTheme.titleLarge?.copyWith(fontSize: 22.0, fontWeight: FontWeight.w600),
+          titleMedium: poppinsTheme.titleMedium?.copyWith(fontSize: 18.0, fontWeight: FontWeight.w500),
+          bodyLarge: poppinsTheme.bodyLarge?.copyWith(fontSize: 16.0, color: Colors.white70),
+          bodyMedium: poppinsTheme.bodyMedium?.copyWith(fontSize: 14.0, color: Colors.white70),
         ),
 
-        // --- 3. GLOBALER KARTEN LOOK (Schatten & Ecken) ---
-        // KORREKTUR: Es muss CardThemeData heißen!
         cardTheme: const CardThemeData(
           color: Color(0xFF1D2229), 
           elevation: 0.0, 
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(20.0)),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
           margin: EdgeInsets.only(bottom: 16.0),
         ),
 
-        // --- 4. GLOBALER APPBAR LOOK ---
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.transparent, 
           elevation: 0.0,
           centerTitle: false,
           iconTheme: IconThemeData(color: Colors.white),
-          titleTextStyle: TextStyle(color: Colors.white, fontSize: 24.0, fontWeight: FontWeight.bold),
         ),
 
-        // --- 5. GLOBALER BUTTON LOOK ---
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF00E5FF),
@@ -69,10 +63,8 @@ class FachinformatikerTrainerApp extends StatelessWidget {
             elevation: 8.0, 
             shadowColor: const Color(0x6600E5FF), 
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 14.0),
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(16.0)),
-            ),
-            textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16.0))),
+            textStyle: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16.0),
           ),
         ),
       ),
