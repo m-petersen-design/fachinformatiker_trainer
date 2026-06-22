@@ -1,28 +1,22 @@
 class Fachrichtung {
   final int id;
-  final String name;
   final String kuerzel;
-  final String? beschreibung;
-  final String? iconName;
-  final String farbeHex;
+  final String name;
+  final int xp; // NEU: Nimmt die XP aus der Datenbank auf
 
   Fachrichtung({
     required this.id,
-    required this.name,
     required this.kuerzel,
-    this.beschreibung,
-    this.iconName,
-    required this.farbeHex,
+    required this.name,
+    this.xp = 0,
   });
 
   factory Fachrichtung.fromMap(Map<String, dynamic> map) {
     return Fachrichtung(
       id: map['id'],
-      name: map['name'],
       kuerzel: map['kuerzel'],
-      beschreibung: map['beschreibung'],
-      iconName: map['icon_name'],
-      farbeHex: map['farbe_hex'] ?? '#2196F3',
+      name: map['name'],
+      xp: map['xp'] ?? 0, // NEU: Liest die XP sicher aus
     );
   }
 }

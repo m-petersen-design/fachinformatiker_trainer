@@ -11,8 +11,8 @@ class DatabaseService {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    // Wir erzwingen v6, um eine garantiert saubere Tabelle aufzubauen!
-    _database = await _initDB('fachinformatiker_v6.db');
+    // v10: Spaced Repetition (Spalten für Fälligkeit hinzugefügt)
+    _database = await _initDB('fachinformatiker_v10.db');
     return _database!;
   }
 
@@ -43,7 +43,8 @@ class DatabaseService {
         kuerzel TEXT NOT NULL UNIQUE,
         beschreibung TEXT,
         icon_name TEXT,
-        farbe_hex TEXT NOT NULL DEFAULT '#2196F3'
+        farbe_hex TEXT NOT NULL DEFAULT '#2196F3',
+        xp INTEGER NOT NULL DEFAULT 0 
       )
     ''');
 
@@ -82,12 +83,15 @@ class DatabaseService {
       )
     ''');
 
+    // HIER IST DAS UPDATE FÜR DEN SCHWÄCHEN-TRAINER
     await db.execute('''
       CREATE TABLE user_fortschritt (
         frage_id INTEGER PRIMARY KEY,
         korrekt_beantwortet INTEGER NOT NULL DEFAULT 0 CHECK (korrekt_beantwortet IN (0,1)),
         anzahl_versuche INTEGER NOT NULL DEFAULT 0,
         letzter_versuch TEXT,
+        naechste_faelligkeit TEXT, 
+        intervall_tage INTEGER NOT NULL DEFAULT 0,
         FOREIGN KEY (frage_id) REFERENCES frage(id) ON DELETE CASCADE
       )
     ''');
@@ -105,19 +109,21 @@ class DatabaseService {
     await db.execute('CREATE INDEX idx_frage_themengebiet ON frage(themengebiet_id)');
     await db.execute('CREATE INDEX idx_antwort_frage ON antwort_option(frage_id)');
 
-    // Standard-Fachrichtungen
-    await db.execute("INSERT INTO fachrichtung (kuerzel, name) VALUES ('FISI', 'Systemintegration')");
-    await db.execute("INSERT INTO fachrichtung (kuerzel, name) VALUES ('FIAE', 'Anwendungsentwicklung')");
-    await db.execute("INSERT INTO fachrichtung (kuerzel, name) VALUES ('FIDP', 'Daten- und Prozessanalyse')");
+    await db.execute("INSERT INTO fachrichtung (kuerzel, name, xp) VALUES ('FISI', 'Systemintegration', 0)");
+    await db.execute("INSERT INTO fachrichtung (kuerzel, name, xp) VALUES ('FIAE', 'Anwendungsentwicklung', 0)");
+    await db.execute("INSERT INTO fachrichtung (kuerzel, name, xp) VALUES ('FIDP', 'Daten- und Prozessanalyse', 0)");
+    await db.execute("INSERT INTO fachrichtung (kuerzel, name, xp) VALUES ('UNI', 'Universität', 0)");
+    await db.execute("INSERT INTO fachrichtung (kuerzel, name, xp) VALUES ('BS', 'Berufsschule', 0)");
 
-    // Standard-Themen (IDs 1 bis 6)
     await db.execute("INSERT INTO themengebiet (fachrichtung_id, name) VALUES (1, 'Netzwerktechnik & Hardware')");
     await db.execute("INSERT INTO themengebiet (fachrichtung_id, name) VALUES (1, 'Serveradministration (Linux/Windows)')");
     await db.execute("INSERT INTO themengebiet (fachrichtung_id, name) VALUES (2, 'Objektorientierte Programmierung')");
     await db.execute("INSERT INTO themengebiet (fachrichtung_id, name) VALUES (2, 'Softwarearchitektur & Design')");
     await db.execute("INSERT INTO themengebiet (fachrichtung_id, name) VALUES (3, 'Datenbanken & SQL')");
-    await db.execute("INSERT INTO themengebiet (fachrichtung_id, name) VALUES (3, 'Datenanalyse & Big Data')");
+    await db.execute("INSERT INTO themengebiet (fachrichtung_id, name) VALUES (4, 'Theoretische Informatik (UNI)')");
+    await db.execute("INSERT INTO themengebiet (fachrichtung_id, name) VALUES (4, 'Höhere Mathematik (UNI)')");
+    await db.execute("INSERT INTO themengebiet (fachrichtung_id, name) VALUES (5, 'Wirtschaft & Sozialkunde (BS)')");
 
-    print("✅ Neue DB (v6) mit korrekter Schema-Struktur erfolgreich erstellt!");
+    print("✅ Neue DB (v10) mit Spaced Repetition erfolgreich erstellt!");
   }
 }
