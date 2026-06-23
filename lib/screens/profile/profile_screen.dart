@@ -124,6 +124,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // ==========================================
+  // GAMIFICATION: TECH-BADGES
+  // ==========================================
+  Widget _buildBadge(String title, IconData icon, bool isUnlocked, Color glowColor) {
+    return Container(
+      width: 100,
+      margin: const EdgeInsets.only(right: 16),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isUnlocked ? glowColor.withValues(alpha: 0.1) : Colors.black26,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: isUnlocked ? glowColor : Colors.white10, width: 1.5),
+        boxShadow: isUnlocked ? [BoxShadow(color: glowColor.withValues(alpha: 0.2), blurRadius: 10, spreadRadius: 1)] : [],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: isUnlocked ? glowColor : Colors.white24, size: 36),
+          const SizedBox(height: 8),
+          Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isUnlocked ? Colors.white : Colors.white38)),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -162,6 +187,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Row(children: [_buildStatBox('Gesamt XP', '$_globalXP', Icons.star, Theme.of(context).colorScheme.primary), const SizedBox(width: 16), _buildStatBox('Streak', '$_streak', Icons.local_fire_department, Colors.orangeAccent)]),
             const SizedBox(height: 24),
             _buildPerformanceChart(),
+            
+            // BADGES SECTION
+            const SizedBox(height: 36),
+            const Align(alignment: Alignment.centerLeft, child: Text('Errungenschaften', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white54, letterSpacing: 1.1))),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 110,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                  _buildBadge('Boot-Up', Icons.power_settings_new, _globalXP > 0, Colors.greenAccent),
+                  _buildBadge('Dauerbetrieb', Icons.battery_charging_full, _streak >= 7, Colors.orangeAccent),
+                  _buildBadge('XP-Junkie', Icons.military_tech, _globalXP >= 1000, Colors.amber),
+                  _buildBadge('Arch-User', Icons.terminal, _globalXP >= 3000, Colors.cyanAccent),
+                ],
+              ),
+            ),
             const SizedBox(height: 36),
 
             const Align(alignment: Alignment.centerLeft, child: Text('Fach-Fortschritt', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white54, letterSpacing: 1.1))),

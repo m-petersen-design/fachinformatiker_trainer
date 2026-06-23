@@ -1,9 +1,49 @@
+import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/database/database_service.dart';
 import '../../models/fachrichtung.dart';
 import '../quiz/quiz_screen.dart';
+
+// ==========================================
+// SCHREIBMASCHINEN-EFFEKT
+// ==========================================
+class TypewriterText extends StatefulWidget {
+  final String text;
+  final TextStyle style;
+  const TypewriterText(this.text, {super.key, required this.style});
+  @override
+  State<TypewriterText> createState() => _TypewriterTextState();
+}
+
+class _TypewriterTextState extends State<TypewriterText> {
+  String displayedText = "";
+  int charIndex = 0;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _type();
+  }
+  @override
+  void dispose() { _timer?.cancel(); super.dispose(); }
+
+  void _type() {
+    _timer = Timer.periodic(const Duration(milliseconds: 30), (timer) {
+      if (charIndex < widget.text.length && mounted) {
+        setState(() { displayedText += widget.text[charIndex]; charIndex++; });
+      } else {
+        timer.cancel();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => Text(displayedText + (charIndex < widget.text.length ? "_" : ""), style: widget.style);
+}
 
 class BounceCard extends StatefulWidget {
   final Widget child;
@@ -28,7 +68,7 @@ class _BounceCardState extends State<BounceCard> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     return GestureDetector(
       onTapDown: (_) => _controller.forward(),
-      onTapUp: (_) { _controller.reverse(); widget.onTap(); },
+      onTapUp: (_) { HapticFeedback.lightImpact(); _controller.reverse(); widget.onTap(); },
       onTapCancel: () => _controller.reverse(),
       child: ScaleTransition(scale: _scaleAnimation, child: widget.child),
     );
@@ -76,6 +116,74 @@ class _ThemenScreenState extends State<ThemenScreen> {
     await _ladeDaten();
   }
 
+  Widget _buildSystemLogTerminal() {
+    bool hasWarnings = _faelligeFragenCount > 0;
+    Color terminalColor = hasWarnings ? Colors.orangeAccent : Colors.green;
+    String status = hasWarnings ? '[WARN] Systemstabilität gefährdet.' : '[OK] System nominal.';
+    String message = hasWarnings 
+      ? '$_faelligeFragenCount Datenfragmente erfordern sofortige Re-Kalibrierung (Spaced Repetition).' 
+      : 'Keine Speicherlücken im Langzeitarchiv erkannt.';
+
+    bool isLight = Theme.of(context).brightness == Brightness.light;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isLight ? Colors.white : Colors.black87,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: terminalColor.withValues(alpha: 0.5), width: 1.5),
+        boxShadow: [BoxShadow(color: terminalColor.withValues(alpha: 0.15), blurRadius: 10, spreadRadius: 1)],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(color: terminalColor.withValues(alpha: 0.1), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))),
+            child: Row(
+              children: [
+                Icon(Icons.terminal, color: terminalColor, size: 16),
+                const SizedBox(width: 8),
+                Text('sys_log_daemon.exe', style: GoogleFonts.firaCode(color: terminalColor, fontSize: 12, fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(status, style: GoogleFonts.firaCode(color: terminalColor, fontSize: 14, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                TypewriterText('> $message', style: GoogleFonts.firaCode(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8), fontSize: 13)),
+                if (hasWarnings) ...[
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: terminalColor.withValues(alpha: 0.2), 
+                        foregroundColor: terminalColor, 
+                        side: BorderSide(color: terminalColor),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      icon: const Icon(Icons.play_arrow), 
+                      label: Text('Re-Kalibrierung starten', style: GoogleFonts.firaCode(fontWeight: FontWeight.bold)),
+                      onPressed: () async {
+                        HapticFeedback.selectionClick();
+                        await Navigator.push(context, MaterialPageRoute(builder: (context) => QuizScreen(themengebietId: -1, themengebietName: '🔥 Schwächen (${widget.fachrichtung.kuerzel})', fachrichtungId: widget.fachrichtung.id)));
+                        _refresh();
+                      },
+                    ),
+                  )
+                ]
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Color accentColor = Color(int.parse(widget.fachrichtung.farbeHex.replaceAll('#', '0xFF')));
@@ -86,7 +194,6 @@ class _ThemenScreenState extends State<ThemenScreen> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // EMPFÄNGER FÜR DIE HERO ANIMATION
             Hero(
               tag: 'fach_banner_${widget.fachrichtung.id}',
               child: Material(
@@ -99,79 +206,32 @@ class _ThemenScreenState extends State<ThemenScreen> {
               ),
             ),
             const SizedBox(width: 12),
-            Flexible(child: Text(widget.fachrichtung.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18), overflow: TextOverflow.ellipsis)),
+            Flexible(child: Text(widget.fachrichtung.name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Theme.of(context).colorScheme.onSurface), overflow: TextOverflow.ellipsis)),
           ],
         ),
         backgroundColor: Colors.transparent, elevation: 0, centerTitle: false,
         flexibleSpace: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [const Color(0xFF121419).withValues(alpha: 0.9), const Color(0xFF121419).withValues(alpha: 0.0)]),
+            gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.9), Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.0)]),
           ),
         ),
       ),
       body: _isLoading 
         ? Center(child: CircularProgressIndicator(color: accentColor))
         : RefreshIndicator(
-            onRefresh: _refresh, color: accentColor, backgroundColor: const Color(0xFF1D2229),
+            onRefresh: _refresh, color: accentColor, backgroundColor: Theme.of(context).cardColor,
             child: ListView(
               padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 20, bottom: 40, left: 16, right: 16),
               children: [
-                // GLASSMORPHISMUS FÜR DEN TRAINER
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1D2229).withValues(alpha: 0.7),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: _faelligeFragenCount > 0 ? Colors.orangeAccent.withValues(alpha: 0.5) : Colors.greenAccent.withValues(alpha: 0.3), width: 2),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(_faelligeFragenCount > 0 ? Icons.local_fire_department : Icons.check_circle_outline, color: _faelligeFragenCount > 0 ? Colors.orangeAccent : Colors.greenAccent, size: 32),
-                                const SizedBox(width: 12),
-                                Text('Schwächen-Trainer', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: _faelligeFragenCount > 0 ? Colors.orangeAccent : Colors.greenAccent)),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              _faelligeFragenCount > 0 ? 'Du hast $_faelligeFragenCount Fragen fällig. Wiederhole sie jetzt!' : 'Alles perfekt! Dein Gedächtnis ist up-to-date.',
-                              style: const TextStyle(fontSize: 15, color: Colors.white70, height: 1.4),
-                            ),
-                            if (_faelligeFragenCount > 0) ...[
-                              const SizedBox(height: 20),
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.orangeAccent, foregroundColor: Colors.black87, shadowColor: const Color(0x66FFAB40), padding: const EdgeInsets.symmetric(vertical: 16)),
-                                  icon: const Icon(Icons.fitness_center), label: const Text('Jetzt trainieren'),
-                                  onPressed: () async {
-                                    await Navigator.push(context, MaterialPageRoute(builder: (context) => QuizScreen(themengebietId: -1, themengebietName: '🔥 Schwächen (${widget.fachrichtung.kuerzel})', fachrichtungId: widget.fachrichtung.id)));
-                                    _refresh();
-                                  },
-                                ),
-                              )
-                            ]
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                _buildSystemLogTerminal(),
                 
-                const Padding(
-                  padding: EdgeInsets.only(top: 36.0, bottom: 16.0, left: 4.0),
-                  child: Text('Lern-Module', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white54, letterSpacing: 1.1)),
+                Padding(
+                  padding: const EdgeInsets.only(top: 36.0, bottom: 16.0, left: 4.0),
+                  child: Text('Lern-Module', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), letterSpacing: 1.1)),
                 ),
 
                 if (_themen.isEmpty)
-                  Padding(padding: const EdgeInsets.all(20.0), child: Center(child: Text('Noch keine Module vorhanden.', style: TextStyle(fontSize: 15, color: Colors.white.withValues(alpha: 0.4)))))
+                  Padding(padding: const EdgeInsets.all(20.0), child: Center(child: Text('Noch keine Module vorhanden.', style: TextStyle(fontSize: 15, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)))))
                 else
                   ..._themen.map((thema) => BounceCard(
                     onTap: () async {
@@ -180,15 +240,14 @@ class _ThemenScreenState extends State<ThemenScreen> {
                     },
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 12.0),
-                      decoration: BoxDecoration(color: const Color(0xFF1D2229), borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 8, offset: const Offset(0, 4))]),
+                      decoration: BoxDecoration(color: Theme.of(context).cardColor, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 8, offset: const Offset(0, 4))]),
                       child: Stack(
                         children: [
-                          // SCI-FI EASTER EGG: Subtiles Tech-Wasserzeichen (Aurebesh Style)
                           Positioned(
                             right: -20, bottom: -10,
                             child: Text(
                               thema['name'].toString().toUpperCase().replaceAll(' ', ''),
-                              style: GoogleFonts.orbitron(fontSize: 50, fontWeight: FontWeight.bold, color: Colors.white.withValues(alpha: 0.02)),
+                              style: GoogleFonts.orbitron(fontSize: 50, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.02)),
                             ),
                           ),
                           ListTile(
@@ -198,11 +257,11 @@ class _ThemenScreenState extends State<ThemenScreen> {
                               decoration: BoxDecoration(color: accentColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
                               child: Icon(Icons.folder_open, color: accentColor, size: 28),
                             ),
-                            title: Text(thema['name'].toString(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
+                            title: Text(thema['name'].toString(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Theme.of(context).colorScheme.onSurface)),
                             trailing: Container(
                               padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), shape: BoxShape.circle),
-                              child: const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 16),
+                              decoration: BoxDecoration(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05), shape: BoxShape.circle),
+                              child: Icon(Icons.arrow_forward_ios, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), size: 16),
                             ),
                           ),
                         ],
