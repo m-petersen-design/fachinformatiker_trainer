@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,9 +6,6 @@ import '../../core/database/database_service.dart';
 import '../../models/fachrichtung.dart';
 import '../quiz/quiz_screen.dart';
 
-// ==========================================
-// SCHREIBMASCHINEN-EFFEKT
-// ==========================================
 class TypewriterText extends StatefulWidget {
   final String text;
   final TextStyle style;
@@ -106,7 +102,9 @@ class _ThemenScreenState extends State<ThemenScreen> {
     ''', [widget.fachrichtung.id, jetzt]);
 
     int count = 0;
-    if (countResult.isNotEmpty) count = countResult.first['count'] as int;
+    if (countResult.isNotEmpty) {
+      count = countResult.first['count'] as int;
+    }
 
     setState(() { _themen = themen; _faelligeFragenCount = count; _isLoading = false; });
   }

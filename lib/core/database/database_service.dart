@@ -1,6 +1,6 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart'; // NEU: Für debugPrint
 import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class DatabaseService {
@@ -11,7 +11,6 @@ class DatabaseService {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    // v10: Spaced Repetition (Spalten für Fälligkeit hinzugefügt)
     _database = await _initDB('fachinformatiker_v10.db');
     return _database!;
   }
@@ -83,7 +82,6 @@ class DatabaseService {
       )
     ''');
 
-    // HIER IST DAS UPDATE FÜR DEN SCHWÄCHEN-TRAINER
     await db.execute('''
       CREATE TABLE user_fortschritt (
         frage_id INTEGER PRIMARY KEY,
@@ -124,6 +122,6 @@ class DatabaseService {
     await db.execute("INSERT INTO themengebiet (fachrichtung_id, name) VALUES (4, 'Höhere Mathematik (UNI)')");
     await db.execute("INSERT INTO themengebiet (fachrichtung_id, name) VALUES (5, 'Wirtschaft & Sozialkunde (BS)')");
 
-    print("✅ Neue DB (v10) mit Spaced Repetition erfolgreich erstellt!");
+    debugPrint("✅ Neue DB (v10) mit Spaced Repetition erfolgreich erstellt!");
   }
 }

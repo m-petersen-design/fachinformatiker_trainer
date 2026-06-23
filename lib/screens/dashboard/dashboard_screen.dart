@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../main.dart'; 
 import '../../core/database/database_service.dart';
+import '../../core/audio_service.dart'; // NEU: Audio Import
 import '../../models/fachrichtung.dart';
 import '../themen/themen_screen.dart';
 import '../admin/admin_dashboard_screen.dart';
@@ -79,6 +80,7 @@ class _BounceCardState extends State<BounceCard> with SingleTickerProviderStateM
       onTapDown: (_) => _controller.forward(),
       onTapUp: (_) { 
         HapticFeedback.lightImpact(); 
+        AudioService.instance.playClick(); // NEU: Audio Klick
         _controller.reverse(); 
         widget.onTap(); 
       },
@@ -114,6 +116,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     _starController = AnimationController(vsync: this, duration: const Duration(seconds: 10))..repeat();
     _ladeDaten();
     _loadDailyQuests();
+
+    // NEU: Spiele den Startup-Sound!
+    AudioService.instance.playStartup();
 
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) setState(() => _showVaderGreeting = true);
@@ -168,6 +173,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
 
   void _toggleTheme() async {
     HapticFeedback.selectionClick();
+    AudioService.instance.playStartup(); // Schönes Feedback beim Wechsel
     final prefs = await SharedPreferences.getInstance();
     bool isCurrentlyJedi = themeNotifier.value == ThemeMode.light;
     themeNotifier.value = isCurrentlyJedi ? ThemeMode.dark : ThemeMode.light;
@@ -277,6 +283,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     return GestureDetector(
       onTap: () async {
         HapticFeedback.lightImpact();
+        AudioService.instance.playClick();
         await Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileScreen()));
         _ladeDaten(); _loadDailyQuests();
       },
@@ -432,6 +439,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           IconButton(
             onPressed: () async {
               HapticFeedback.selectionClick();
+              AudioService.instance.playClick();
               await Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminDashboardScreen()));
               _ladeDaten(); _loadDailyQuests();
             }, 
@@ -480,7 +488,6 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8),
-                      // GROSSES HALLO-GIF: 120x120
                       child: Image.asset('assets/vader_hallo.gif', width: 120, height: 120, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => Icon(Icons.person, color: Theme.of(context).colorScheme.onSurface, size: 60)),
                     ),
                     const SizedBox(width: 16),

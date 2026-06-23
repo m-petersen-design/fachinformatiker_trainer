@@ -86,9 +86,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     }
   }
 
-  // ==========================================
-  // HYBRID-IMPORT: JSON-ID hat Vorrang, Dropdown ist nur Fallback
-  // ==========================================
   Future<void> _importiereKlausur(List<dynamic> klausurDatenRaw) async {
     final adminRepo = AdminRepository();
     int importierteFragen = 0;
@@ -99,16 +96,13 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       
       int? finaleId;
       
-      // 1. Prio: Hat das JSON eine feste, gültige ID (> 0)?
       if (frage['themengebiet_id'] != null && frage['themengebiet_id'] is int && frage['themengebiet_id'] > 0) {
         finaleId = frage['themengebiet_id']; 
       } 
-      // 2. Prio: Wenn das JSON KEINE ID hat (0 oder fehlt), schau nach dem Dropdown-Ordner
       else if (_selectedThema != null) {
         finaleId = _selectedThema!.id; 
       }
 
-      // Wenn beides nicht existiert, überspringen wir die Frage sicher
       if (finaleId == null) {
         uebersprungeneFragen++;
         continue;
@@ -131,15 +125,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       importierteFragen++;
     }
 
-    if (mounted) {
-      String meldung = '🎉 $importierteFragen Fragen erfolgreich importiert!';
-      if (uebersprungeneFragen > 0) {
-        meldung += ' ($uebersprungeneFragen übersprungen, da keine ID im JSON und kein Ziel-Ordner gewählt war).';
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(meldung), backgroundColor: Colors.purple, duration: const Duration(seconds: 4))
-      );
+    if (!mounted) return;
+
+    String meldung = '🎉 $importierteFragen Fragen erfolgreich importiert!';
+    if (uebersprungeneFragen > 0) {
+      meldung += ' ($uebersprungeneFragen übersprungen, da keine ID im JSON und kein Ziel-Ordner gewählt war).';
     }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(meldung), backgroundColor: Colors.purple, duration: const Duration(seconds: 4))
+    );
   }
 
   @override
@@ -213,6 +207,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                           const SizedBox(height: 20),
                           
                           DropdownButtonFormField<Fachrichtung>(
+                            // ignore: deprecated_member_use
                             value: _selectedFachrichtung,
                             decoration: const InputDecoration(labelText: 'Welche Fachrichtung?', border: OutlineInputBorder()),
                             items: _fachrichtungen.map((fach) => DropdownMenuItem(value: fach, child: Text('${fach.kuerzel} - ${fach.name}'))).toList(),
@@ -251,6 +246,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                           const SizedBox(height: 10),
                           
                           DropdownButtonFormField<Themengebiet>(
+                            // ignore: deprecated_member_use
                             value: _selectedThema,
                             decoration: const InputDecoration(labelText: 'Ziel-Thema auswählen (Optional)', border: OutlineInputBorder()),
                             items: _themen.map((thema) => DropdownMenuItem(value: thema, child: Text(thema.name))).toList(),
@@ -265,7 +261,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                             icon: const Icon(Icons.file_upload),
                             label: const Text('Fragen (JSON) importieren', style: TextStyle(fontSize: 16)),
                             onPressed: () async {
-                              // DIE SPERRE IST HIER JETZT KOMPLETT WEG!
                               try {
                                 const XTypeGroup typeGroup = XTypeGroup(label: 'JSON', extensions: <String>['json']);
                                 final XFile? file = await openFile(acceptedTypeGroups: <XTypeGroup>[typeGroup]);
@@ -287,7 +282,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                   await _importiereKlausur(rawList);
                                 }
                               } catch (e) {
-                                if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Fehler: $e'), backgroundColor: Colors.red));
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Fehler: $e'), backgroundColor: Colors.red));
+                                }
                               }
                             },
                           ),

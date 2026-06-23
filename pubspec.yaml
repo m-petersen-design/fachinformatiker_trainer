@@ -22,6 +22,7 @@ dependencies:
   google_fonts: ^8.1.0
   fl_chart: ^1.2.0
   shared_preferences: ^2.5.5
+  audioplayers: ^6.8.0
 
 dev_dependencies:
   flutter_test:
@@ -34,3 +35,4 @@ flutter:
   # Hier sind deine Bilder-Ordner korrekt angemeldet
   assets:
     - assets/
+    - assets/sounds/

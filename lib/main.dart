@@ -22,7 +22,7 @@ class FachinformatikerTrainerApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: themeNotifier,
-      builder: (_, ThemeMode currentMode, __) {
+      builder: (context, ThemeMode currentMode, child) {
         // --- SITH MODE (DARK) ---
         final TextTheme darkTextTheme = GoogleFonts.poppinsTextTheme().apply(bodyColor: Colors.white, displayColor: Colors.white);
         final darkTheme = ThemeData(

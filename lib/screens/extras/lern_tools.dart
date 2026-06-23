@@ -25,7 +25,9 @@ class _HolocronScreenState extends State<HolocronScreen> {
 
   Future<void> _loadFavorites() async {
     final db = await DatabaseService.instance.database;
-    try { await db.execute("ALTER TABLE frage ADD COLUMN is_favorite INTEGER DEFAULT 0"); } catch (_) {}
+    try { 
+      await db.execute("ALTER TABLE frage ADD COLUMN is_favorite INTEGER DEFAULT 0"); 
+    } catch (_) {}
     final favs = await db.query('frage', where: 'is_favorite = 1');
     setState(() { _favorites = favs; _isLoading = false; });
   }
@@ -111,7 +113,9 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
     HapticFeedback.lightImpact();
     setState(() {
       _showAnswer = false;
-      if (_currentIndex < _cards.length - 1) _currentIndex++;
+      if (_currentIndex < _cards.length - 1) {
+        _currentIndex++;
+      }
     });
   }
 
@@ -222,7 +226,9 @@ class _ExamScreenState extends State<ExamScreen> {
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_timeRemaining > 0) {
-        if(mounted) setState(() => _timeRemaining--);
+        if (mounted) {
+          setState(() => _timeRemaining--);
+        }
       } else {
         _finishExam();
       }
@@ -235,12 +241,16 @@ class _ExamScreenState extends State<ExamScreen> {
     List<Map<String, dynamic>> examBuild = [];
     
     for (var q in questions) {
-      if (q['typ'] == 'freitext') continue; 
+      if (q['typ'] == 'freitext') {
+        continue; 
+      }
       final answers = await db.query('antwort_option', where: 'frage_id = ?', whereArgs: [q['id']]);
       List<Map<String, dynamic>> mixedAnswers = List.from(answers)..shuffle();
       examBuild.add({'frage': q, 'antworten': mixedAnswers, 'selected_index': -1, 'is_correct': false});
     }
-    if(mounted) setState(() { _examData = examBuild; _isLoading = false; });
+    if (mounted) {
+      setState(() { _examData = examBuild; _isLoading = false; });
+    }
   }
 
   void _finishExam() {
@@ -250,11 +260,17 @@ class _ExamScreenState extends State<ExamScreen> {
     double percentage = _examData.isEmpty ? 0 : (correct / _examData.length) * 100;
     
     String note = "Ungenügend";
-    if (percentage >= 92) note = "Sehr Gut (1)";
-    else if (percentage >= 81) note = "Gut (2)";
-    else if (percentage >= 67) note = "Befriedigend (3)";
-    else if (percentage >= 50) note = "Ausreichend (4)";
-    else if (percentage >= 30) note = "Mangelhaft (5)";
+    if (percentage >= 92) {
+      note = "Sehr Gut (1)";
+    } else if (percentage >= 81) {
+      note = "Gut (2)";
+    } else if (percentage >= 67) {
+      note = "Befriedigend (3)";
+    } else if (percentage >= 50) {
+      note = "Ausreichend (4)";
+    } else if (percentage >= 30) {
+      note = "Mangelhaft (5)";
+    }
 
     showDialog(
       context: context,
@@ -329,7 +345,9 @@ class _ExamScreenState extends State<ExamScreen> {
                               onTap: () {
                                 HapticFeedback.selectionClick();
                                 setState(() {
-                                  if (item['selected_index'] == -1) _answeredCount++;
+                                  if (item['selected_index'] == -1) {
+                                    _answeredCount++;
+                                  }
                                   item['selected_index'] = aIndex;
                                   item['is_correct'] = (a['ist_korrekt'] == 1 || a['ist_korrekt'] == '1');
                                 });

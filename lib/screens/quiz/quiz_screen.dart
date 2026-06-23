@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart'; 
 import 'package:sqflite/sqflite.dart'; 
 import '../../core/database/database_service.dart';
+import '../../core/audio_service.dart'; 
 
 class TypewriterText extends StatefulWidget {
   final String text;
@@ -24,8 +25,11 @@ class _TypewriterTextState extends State<TypewriterText> {
   void dispose() { _timer?.cancel(); super.dispose(); }
   void _type() {
     _timer = Timer.periodic(const Duration(milliseconds: 30), (timer) {
-      if (charIndex < widget.text.length && mounted) { setState(() { displayedText += widget.text[charIndex]; charIndex++; }); } 
-      else { timer.cancel(); }
+      if (charIndex < widget.text.length && mounted) { 
+        setState(() { displayedText += widget.text[charIndex]; charIndex++; }); 
+      } else { 
+        timer.cancel(); 
+      }
     });
   }
   @override
@@ -38,7 +42,9 @@ class ScanlinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..color = lineColor.withValues(alpha: 0.15)..strokeWidth = 2.0; 
-    for (double i = 0; i < size.height; i += 5) { canvas.drawLine(Offset(0, i), Offset(size.width, i), paint); }
+    for (double i = 0; i < size.height; i += 5) { 
+      canvas.drawLine(Offset(0, i), Offset(size.width, i), paint); 
+    }
   }
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
@@ -65,26 +71,46 @@ class TopologyPainter extends CustomPainter {
 
     if (type == 'topology_star') {
       final Offset center = Offset(cx, cy);
-      for (var point in points) canvas.drawLine(center, point, linePaint);
-      for (var point in points) { canvas.drawCircle(point, 12, nodePaint); canvas.drawCircle(point, 12, nodeBorderPaint); }
-      canvas.drawCircle(center, 18, nodePaint); canvas.drawCircle(center, 18, nodeBorderPaint..color = Colors.amberAccent);
+      for (var point in points) {
+        canvas.drawLine(center, point, linePaint);
+      }
+      for (var point in points) { 
+        canvas.drawCircle(point, 12, nodePaint); 
+        canvas.drawCircle(point, 12, nodeBorderPaint); 
+      }
+      canvas.drawCircle(center, 18, nodePaint); 
+      canvas.drawCircle(center, 18, nodeBorderPaint..color = Colors.amberAccent);
     } 
     else if (type == 'topology_ring') {
-      for (int i = 0; i < numNodes; i++) canvas.drawLine(points[i], points[(i + 1) % numNodes], linePaint);
-      for (var point in points) { canvas.drawCircle(point, 12, nodePaint); canvas.drawCircle(point, 12, nodeBorderPaint); }
+      for (int i = 0; i < numNodes; i++) {
+        canvas.drawLine(points[i], points[(i + 1) % numNodes], linePaint);
+      }
+      for (var point in points) { 
+        canvas.drawCircle(point, 12, nodePaint); 
+        canvas.drawCircle(point, 12, nodeBorderPaint); 
+      }
     } 
     else if (type == 'topology_bus') {
-      final double ly = cy; canvas.drawLine(Offset(20, ly), Offset(size.width - 20, ly), linePaint..strokeWidth = 3.0);
+      final double ly = cy; 
+      canvas.drawLine(Offset(20, ly), Offset(size.width - 20, ly), linePaint..strokeWidth = 3.0);
       double spacing = (size.width - 60) / (numNodes - 1);
       for (int i = 0; i < numNodes; i++) {
         double nx = 30 + (i * spacing); double ny = (i % 2 == 0) ? ly - 40 : ly + 40; Offset nodePos = Offset(nx, ny);
         canvas.drawLine(Offset(nx, ly), nodePos, linePaint..strokeWidth = 1.5);
-        canvas.drawCircle(nodePos, 12, nodePaint); canvas.drawCircle(nodePos, 12, nodeBorderPaint);
+        canvas.drawCircle(nodePos, 12, nodePaint); 
+        canvas.drawCircle(nodePos, 12, nodeBorderPaint);
       }
     }
     else if (type == 'topology_mesh') {
-      for (int i = 0; i < points.length; i++) { for (int j = i + 1; j < points.length; j++) canvas.drawLine(points[i], points[j], linePaint); }
-      for (var point in points) { canvas.drawCircle(point, 12, nodePaint); canvas.drawCircle(point, 12, nodeBorderPaint); }
+      for (int i = 0; i < points.length; i++) { 
+        for (int j = i + 1; j < points.length; j++) {
+          canvas.drawLine(points[i], points[j], linePaint); 
+        }
+      }
+      for (var point in points) { 
+        canvas.drawCircle(point, 12, nodePaint); 
+        canvas.drawCircle(point, 12, nodeBorderPaint); 
+      }
     }
   }
   @override
@@ -124,8 +150,8 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
   int _aktuelleStreak = 0; bool _zeigeVader = false; String _vaderSpruch = ''; String _vaderGifPath = ''; 
   bool _showErrorFlash = false;
 
-  final List<String> _vaderLobGifs = ['assets/vader_lob.gif', 'assets/vader_lob2.gif', 'assets/vader_lob3.gif'];
-  final List<String> _vaderKritikGifs = ['assets/vader_kritik.gif', 'assets/vader_kritik2.gif', 'assets/vader_kritik3.gif'];
+  final List<String> _vaderLobGifs = ['assets/vader_lob.gif', 'assets/vader_lob_1.gif', 'assets/vader_lob_2.gif'];
+  final List<String> _vaderKritikGifs = ['assets/vader_kritik.gif', 'assets/vader_kritik_1.gif'];
   final List<String> _vaderLob = ["Die Macht ist stark in dir!", "Beeindruckend.", "Du hast dein Schicksal akzeptiert.", "Die IT-Macht gehorcht dir gut."];
   final List<String> _vaderKritik = ["Ich finde deinen Mangel an Wissen beklagenswert.", "Du hast mich zum letzten Mal enttäuscht.", "Noch bist du kein Jedi-Meister."];
 
@@ -153,7 +179,10 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
   void _updateParticles() {
     for (var p in _particles) {
       p.y -= p.speed;
-      if (p.y < -10) { p.y = MediaQuery.of(context).size.height + 10; p.x = _random.nextDouble() * MediaQuery.of(context).size.width; }
+      if (p.y < -10) { 
+        p.y = MediaQuery.of(context).size.height + 10; 
+        p.x = _random.nextDouble() * MediaQuery.of(context).size.width; 
+      }
     }
   }
 
@@ -172,7 +201,10 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
     spielbareFragen.shuffle(); 
     List<Map<String, dynamic>> komplettesQuiz = [];
     for (var frage in spielbareFragen) {
-      if (frage['typ'] == 'freitext') { komplettesQuiz.add({'frage': frage, 'antworten': <Map<String, dynamic>>[]}); continue; }
+      if (frage['typ'] == 'freitext') { 
+        komplettesQuiz.add({'frage': frage, 'antworten': <Map<String, dynamic>>[]}); 
+        continue; 
+      }
       final rawAntworten = await db.query('antwort_option', where: 'frage_id = ?', whereArgs: [frage['id']]);
       List<Map<String, dynamic>> gemischteAntworten = rawAntworten.map((e) => Map<String, dynamic>.from(e)).toList();
       gemischteAntworten.shuffle(); 
@@ -183,15 +215,24 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
 
   void _triggerErrorFlash() {
     HapticFeedback.heavyImpact(); 
+    AudioService.instance.playError();
     setState(() => _showErrorFlash = true);
-    Future.delayed(const Duration(milliseconds: 250), () { if (mounted) setState(() => _showErrorFlash = false); });
+    Future.delayed(const Duration(milliseconds: 250), () { 
+      if (mounted) setState(() => _showErrorFlash = false); 
+    });
   }
 
   void _pruefeAvatarEinsatz(bool warRichtig) {
     if (warRichtig) {
       _aktuelleStreak++;
-      if (_aktuelleStreak > 0 && _aktuelleStreak % 3 == 0) _triggerVaderOverlay(true);
-    } else { _aktuelleStreak = 0; _triggerVaderOverlay(false); _triggerErrorFlash(); }
+      if (_aktuelleStreak > 0 && _aktuelleStreak % 3 == 0) {
+        _triggerVaderOverlay(true);
+      }
+    } else { 
+      _aktuelleStreak = 0; 
+      _triggerVaderOverlay(false); 
+      _triggerErrorFlash(); 
+    }
   }
 
   void _triggerVaderOverlay(bool lob) {
@@ -214,7 +255,10 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
     final String jetzt = DateTime.now().toIso8601String();
     final List<Map<String, dynamic>> result = await db.query('user_fortschritt', where: 'frage_id = ?', whereArgs: [frageId]);
     int altesIntervall = 0, versuche = 0;
-    if (result.isNotEmpty) { altesIntervall = result.first['intervall_tage'] as int; versuche = result.first['anzahl_versuche'] as int; }
+    if (result.isNotEmpty) { 
+      altesIntervall = result.first['intervall_tage'] as int; 
+      versuche = result.first['anzahl_versuche'] as int; 
+    }
     int neuesIntervall = warRichtig ? (altesIntervall == 0 ? 1 : altesIntervall * 2) : 0;
     final naechsteFaelligkeit = DateTime.now().add(Duration(days: neuesIntervall)).toIso8601String();
     await db.insert('user_fortschritt', { 'frage_id': frageId, 'korrekt_beantwortet': warRichtig ? 1 : 0, 'anzahl_versuche': versuche + 1, 'letzter_versuch': jetzt, 'naechste_faelligkeit': naechsteFaelligkeit, 'intervall_tage': neuesIntervall, }, conflictAlgorithm: ConflictAlgorithm.replace);
@@ -223,12 +267,18 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
   void _mcAntwortAuswerten(int index, dynamic istKorrektRaw) {
     if (_frageBeantwortet) return; 
     HapticFeedback.selectionClick(); 
+    AudioService.instance.playClick(); 
     
     setState(() {
       _gewaehlteAntwortIndex = index; _frageBeantwortet = true;
       int istKorrekt = (istKorrektRaw is int) ? istKorrektRaw : int.tryParse(istKorrektRaw.toString()) ?? 0;
       bool warRichtig = (istKorrekt == 1);
-      if (warRichtig) { _richtigeAntworten++; _aktuelleXP += 10; HapticFeedback.mediumImpact(); } else { _falscheAntworten++; }
+      if (warRichtig) { 
+        _richtigeAntworten++; _aktuelleXP += 10; HapticFeedback.mediumImpact(); 
+        AudioService.instance.playSuccess();
+      } else { 
+        _falscheAntworten++; 
+      }
       _pruefeAvatarEinsatz(warRichtig);
     });
     final frageId = _quizDaten[_aktuelleFrageIndex]['frage']['id'] as int;
@@ -236,7 +286,14 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
   }
 
   void _freitextSelbstbewertung(bool warRichtig) {
-    setState(() { if (warRichtig) { _richtigeAntworten++; _aktuelleXP += 15; HapticFeedback.mediumImpact(); } else { _falscheAntworten++; } _pruefeAvatarEinsatz(warRichtig); });
+    setState(() { 
+      if (warRichtig) { 
+        _richtigeAntworten++; _aktuelleXP += 15; HapticFeedback.mediumImpact(); AudioService.instance.playSuccess(); 
+      } else { 
+        _falscheAntworten++; AudioService.instance.playError(); 
+      } 
+      _pruefeAvatarEinsatz(warRichtig); 
+    });
     final frageId = _quizDaten[_aktuelleFrageIndex]['frage']['id'] as int;
     _frageFortschrittSpeichern(frageId, warRichtig);
     _naechsteFrage();
@@ -245,24 +302,31 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
   Future<void> _xpInDatenbankSpeichern() async {
     if (_aktuelleXP > 0) {
       final db = await DatabaseService.instance.database;
-      if (widget.themengebietId == -1 && widget.fachrichtungId != null) await db.rawUpdate('UPDATE fachrichtung SET xp = xp + ? WHERE id = ?', [_aktuelleXP, widget.fachrichtungId]);
-      else await db.rawUpdate('UPDATE fachrichtung SET xp = xp + ? WHERE id = (SELECT fachrichtung_id FROM themengebiet WHERE id = ?)', [_aktuelleXP, widget.themengebietId]);
+      if (widget.themengebietId == -1 && widget.fachrichtungId != null) {
+        await db.rawUpdate('UPDATE fachrichtung SET xp = xp + ? WHERE id = ?', [_aktuelleXP, widget.fachrichtungId]);
+      } else {
+        await db.rawUpdate('UPDATE fachrichtung SET xp = xp + ? WHERE id = (SELECT fachrichtung_id FROM themengebiet WHERE id = ?)', [_aktuelleXP, widget.themengebietId]);
+      }
     }
   }
 
   void _naechsteFrage() {
     _updateDailyQuest(); 
+    AudioService.instance.playClick();
     if (_aktuelleFrageIndex < _quizDaten.length - 1) {
       setState(() { _aktuelleFrageIndex++; _frageBeantwortet = false; _gewaehlteAntwortIndex = null; _freitextController.clear(); });
     } else {
       HapticFeedback.vibrate(); 
+      AudioService.instance.playSuccess(); 
       setState(() => _quizBeendet = true);
       _xpInDatenbankSpeichern(); _particleController.repeat(); 
     }
   }
 
   Widget _buildQuestionImageOrVector(String? path) {
-    if (path == null || path.trim().isEmpty) return const SizedBox.shrink();
+    if (path == null || path.trim().isEmpty) {
+      return const SizedBox.shrink();
+    }
     if (path.startsWith('topology_')) {
       return Container(
         height: 180, margin: const EdgeInsets.only(bottom: 20),
@@ -340,11 +404,13 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
             ),
             onPressed: () async {
               HapticFeedback.selectionClick();
+              AudioService.instance.playClick();
               int newVal = (frage['is_favorite'] == 1) ? 0 : 1;
               final db = await DatabaseService.instance.database;
               await db.rawUpdate('UPDATE frage SET is_favorite = ? WHERE id = ?', [newVal, frage['id']]);
+              if (!mounted) return;
               setState(() { frage['is_favorite'] = newVal; });
-              if(mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(newVal == 1 ? 'Im Holocron Archiv gespeichert!' : 'Aus Archiv entfernt.')));
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(newVal == 1 ? 'Im Holocron Archiv gespeichert!' : 'Aus Archiv entfernt.')));
             },
           )
         ],
@@ -455,7 +521,6 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8),
-                      // GROSSES FEEDBACK-GIF: 150x150
                       child: Image.asset(_vaderGifPath, width: 150, height: 150, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => Icon(Icons.person, color: Theme.of(context).colorScheme.onSurface, size: 80))
                     ),
                     const SizedBox(width: 16),
@@ -494,6 +559,7 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
                     icon: const Icon(Icons.refresh), label: const Text('Neu starten'),
                     onPressed: () {
                       _particleController.stop();
+                      AudioService.instance.playClick();
                       setState(() {
                         _isLoading = true; _quizBeendet = false; _aktuelleFrageIndex = 0;
                         _richtigeAntworten = 0; _falscheAntworten = 0; _aktuelleXP = 0;
@@ -503,7 +569,14 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
                     },
                   ),
                   const SizedBox(height: 16),
-                  TextButton(onPressed: () { _particleController.stop(); Navigator.pop(context); }, child: Text('Zurück zum Menü', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))))
+                  TextButton(
+                    onPressed: () { 
+                      _particleController.stop(); 
+                      AudioService.instance.playClick();
+                      Navigator.pop(context); 
+                    }, 
+                    child: Text('Zurück zum Menü', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)))
+                  )
                 ],
               ),
             ),
