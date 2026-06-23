@@ -1,68 +1,274 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../providers/fach_provider.dart';
-import '../../models/fachrichtung.dart'; 
-import '../quiz/quiz_screen.dart'; // <-- Import ist schon da, super!
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../core/database/database_service.dart';
+import '../../models/fachrichtung.dart';
+import '../quiz/quiz_screen.dart';
 
-class ThemenScreen extends ConsumerWidget {
-  final Fachrichtung fachrichtung;
+class TypewriterText extends StatefulWidget {
+  final String text;
+  final TextStyle style;
+  const TypewriterText(this.text, {super.key, required this.style});
+  @override
+  State<TypewriterText> createState() => _TypewriterTextState();
+}
 
-  const ThemenScreen({super.key, required this.fachrichtung});
+class _TypewriterTextState extends State<TypewriterText> {
+  String displayedText = "";
+  int charIndex = 0;
+  Timer? _timer;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final themenAsync = ref.watch(themengebieteProvider(fachrichtung.id));
+  void initState() {
+    super.initState();
+    _type();
+  }
+  @override
+  void dispose() { _timer?.cancel(); super.dispose(); }
+
+  void _type() {
+    _timer = Timer.periodic(const Duration(milliseconds: 30), (timer) {
+      if (charIndex < widget.text.length && mounted) {
+        setState(() { displayedText += widget.text[charIndex]; charIndex++; });
+      } else {
+        timer.cancel();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => Text(displayedText + (charIndex < widget.text.length ? "_" : ""), style: widget.style);
+}
+
+class BounceCard extends StatefulWidget {
+  final Widget child;
+  final VoidCallback onTap;
+  const BounceCard({super.key, required this.child, required this.onTap});
+  @override
+  State<BounceCard> createState() => _BounceCardState();
+}
+
+class _BounceCardState extends State<BounceCard> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 100));
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.96).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+  }
+  @override
+  void dispose() { _controller.dispose(); super.dispose(); }
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => _controller.forward(),
+      onTapUp: (_) { HapticFeedback.lightImpact(); _controller.reverse(); widget.onTap(); },
+      onTapCancel: () => _controller.reverse(),
+      child: ScaleTransition(scale: _scaleAnimation, child: widget.child),
+    );
+  }
+}
+
+class ThemenScreen extends StatefulWidget {
+  final Fachrichtung fachrichtung;
+  const ThemenScreen({super.key, required this.fachrichtung});
+  @override
+  State<ThemenScreen> createState() => _ThemenScreenState();
+}
+
+class _ThemenScreenState extends State<ThemenScreen> {
+  bool _isLoading = true;
+  List<Map<String, dynamic>> _themen = [];
+  int _faelligeFragenCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _ladeDaten();
+  }
+
+  Future<void> _ladeDaten() async {
+    final db = await DatabaseService.instance.database;
+    final String jetzt = DateTime.now().toIso8601String();
+    
+    final themen = await db.query('themengebiet', where: 'fachrichtung_id = ?', whereArgs: [widget.fachrichtung.id]);
+    final countResult = await db.rawQuery('''
+      SELECT COUNT(f.id) as count FROM frage f
+      JOIN user_fortschritt uf ON f.id = uf.frage_id
+      JOIN themengebiet t ON f.themengebiet_id = t.id
+      WHERE t.fachrichtung_id = ? AND uf.naechste_faelligkeit <= ?
+    ''', [widget.fachrichtung.id, jetzt]);
+
+    int count = 0;
+    if (countResult.isNotEmpty) {
+      count = countResult.first['count'] as int;
+    }
+
+    setState(() { _themen = themen; _faelligeFragenCount = count; _isLoading = false; });
+  }
+
+  Future<void> _refresh() async {
+    setState(() => _isLoading = true);
+    await _ladeDaten();
+  }
+
+  Widget _buildSystemLogTerminal() {
+    bool hasWarnings = _faelligeFragenCount > 0;
+    Color terminalColor = hasWarnings ? Colors.orangeAccent : Colors.green;
+    String status = hasWarnings ? '[WARN] Systemstabilität gefährdet.' : '[OK] System nominal.';
+    String message = hasWarnings 
+      ? '$_faelligeFragenCount Datenfragmente erfordern sofortige Re-Kalibrierung (Spaced Repetition).' 
+      : 'Keine Speicherlücken im Langzeitarchiv erkannt.';
+
+    bool isLight = Theme.of(context).brightness == Brightness.light;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isLight ? Colors.white : Colors.black87,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: terminalColor.withValues(alpha: 0.5), width: 1.5),
+        boxShadow: [BoxShadow(color: terminalColor.withValues(alpha: 0.15), blurRadius: 10, spreadRadius: 1)],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(color: terminalColor.withValues(alpha: 0.1), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))),
+            child: Row(
+              children: [
+                Icon(Icons.terminal, color: terminalColor, size: 16),
+                const SizedBox(width: 8),
+                Text('sys_log_daemon.exe', style: GoogleFonts.firaCode(color: terminalColor, fontSize: 12, fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(status, style: GoogleFonts.firaCode(color: terminalColor, fontSize: 14, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                TypewriterText('> $message', style: GoogleFonts.firaCode(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8), fontSize: 13)),
+                if (hasWarnings) ...[
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: terminalColor.withValues(alpha: 0.2), 
+                        foregroundColor: terminalColor, 
+                        side: BorderSide(color: terminalColor),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      icon: const Icon(Icons.play_arrow), 
+                      label: Text('Re-Kalibrierung starten', style: GoogleFonts.firaCode(fontWeight: FontWeight.bold)),
+                      onPressed: () async {
+                        HapticFeedback.selectionClick();
+                        await Navigator.push(context, MaterialPageRoute(builder: (context) => QuizScreen(themengebietId: -1, themengebietName: '🔥 Schwächen (${widget.fachrichtung.kuerzel})', fachrichtungId: widget.fachrichtung.id)));
+                        _refresh();
+                      },
+                    ),
+                  )
+                ]
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Color accentColor = Color(int.parse(widget.fachrichtung.farbeHex.replaceAll('#', '0xFF')));
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text('Themen: ${fachrichtung.kuerzel}'),
-        backgroundColor: Colors.blueAccent,
-        foregroundColor: Colors.white,
-      ),
-      body: themenAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('Fehler: $error')),
-        data: (themen) {
-          if (themen.isEmpty) {
-            return Center(
-              child: Text('Noch keine Themen für ${fachrichtung.kuerzel} verfügbar.', style: const TextStyle(fontSize: 18)),
-            );
-          }
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(16.0),
-            itemCount: themen.length,
-            itemBuilder: (context, index) {
-              final thema = themen[index];
-
-              return Card(
-                elevation: 3,
-                margin: const EdgeInsets.only(bottom: 12),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  leading: const CircleAvatar(backgroundColor: Colors.blueAccent, child: Icon(Icons.folder, color: Colors.white)),
-                  title: Text(thema.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  trailing: const Icon(Icons.play_arrow, color: Colors.green, size: 30),
-                  
-                  // ==========================================
-                  // HIER IST DIE ÄNDERUNG:
-                  // ==========================================
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => QuizScreen(thema: thema),
-                      ),
-                    );
-                  },
-                  // ==========================================
-                  
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Hero(
+              tag: 'fach_banner_${widget.fachrichtung.id}',
+              child: Material(
+                type: MaterialType.transparency,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(color: accentColor.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(100), border: Border.all(color: accentColor, width: 1.5)),
+                  child: Text(widget.fachrichtung.kuerzel, style: TextStyle(color: accentColor, fontWeight: FontWeight.bold, fontSize: 14)),
                 ),
-              );
-            },
-          );
-        },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Flexible(child: Text(widget.fachrichtung.name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Theme.of(context).colorScheme.onSurface), overflow: TextOverflow.ellipsis)),
+          ],
+        ),
+        backgroundColor: Colors.transparent, elevation: 0, centerTitle: false,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.9), Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.0)]),
+          ),
+        ),
       ),
+      body: _isLoading 
+        ? Center(child: CircularProgressIndicator(color: accentColor))
+        : RefreshIndicator(
+            onRefresh: _refresh, color: accentColor, backgroundColor: Theme.of(context).cardColor,
+            child: ListView(
+              padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 20, bottom: 40, left: 16, right: 16),
+              children: [
+                _buildSystemLogTerminal(),
+                
+                Padding(
+                  padding: const EdgeInsets.only(top: 36.0, bottom: 16.0, left: 4.0),
+                  child: Text('Lern-Module', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), letterSpacing: 1.1)),
+                ),
+
+                if (_themen.isEmpty)
+                  Padding(padding: const EdgeInsets.all(20.0), child: Center(child: Text('Noch keine Module vorhanden.', style: TextStyle(fontSize: 15, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)))))
+                else
+                  ..._themen.map((thema) => BounceCard(
+                    onTap: () async {
+                      await Navigator.push(context, MaterialPageRoute(builder: (context) => QuizScreen(themengebietId: thema['id'] as int, themengebietName: thema['name'].toString())));
+                      _refresh();
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 12.0),
+                      decoration: BoxDecoration(color: Theme.of(context).cardColor, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 8, offset: const Offset(0, 4))]),
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            right: -20, bottom: -10,
+                            child: Text(
+                              thema['name'].toString().toUpperCase().replaceAll(' ', ''),
+                              style: GoogleFonts.orbitron(fontSize: 50, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.02)),
+                            ),
+                          ),
+                          ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+                            leading: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(color: accentColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
+                              child: Icon(Icons.folder_open, color: accentColor, size: 28),
+                            ),
+                            title: Text(thema['name'].toString(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Theme.of(context).colorScheme.onSurface)),
+                            trailing: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05), shape: BoxShape.circle),
+                              child: Icon(Icons.arrow_forward_ios, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), size: 16),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )),
+              ],
+            ),
+          ),
     );
   }
 }

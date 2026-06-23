@@ -3,7 +3,7 @@ import '../../models/fachrichtung.dart';
 import '../../models/themengebiet.dart';
 import '../../repositories/fach_repository.dart';
 import '../../repositories/admin_repository.dart';
-import '../../core/database/database_service.dart'; // Für die Live-Abfrage
+import '../../core/database/database_service.dart';
 
 class AdminFrageScreen extends StatefulWidget {
   const AdminFrageScreen({super.key});
@@ -120,6 +120,7 @@ class _AdminFrageScreenState extends State<AdminFrageScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   DropdownButtonFormField<Fachrichtung>(
+                    // ignore: deprecated_member_use
                     value: _selectedFachrichtung,
                     decoration: const InputDecoration(labelText: 'Fachrichtung', border: OutlineInputBorder()),
                     items: _fachrichtungen.map((f) => DropdownMenuItem(value: f, child: Text(f.kuerzel))).toList(),
@@ -130,6 +131,7 @@ class _AdminFrageScreenState extends State<AdminFrageScreen> {
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<Themengebiet>(
+                    // ignore: deprecated_member_use
                     value: _selectedThema,
                     decoration: const InputDecoration(labelText: 'Themengebiet', border: OutlineInputBorder()),
                     items: _themen.map((t) => DropdownMenuItem(value: t, child: Text(t.name))).toList(),
@@ -169,9 +171,12 @@ class _AdminFrageScreenState extends State<AdminFrageScreen> {
                         padding: const EdgeInsets.only(bottom: 10.0),
                         child: Row(
                           children: [
+                            // ignore: deprecated_member_use
                             Radio<int>(
                               value: index,
+                              // ignore: deprecated_member_use
                               groupValue: _richtigeAntwortIndex,
+                              // ignore: deprecated_member_use
                               onChanged: (val) => setState(() => _richtigeAntwortIndex = val!),
                             ),
                             Expanded(
