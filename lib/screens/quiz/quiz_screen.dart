@@ -15,14 +15,38 @@ class TypewriterText extends StatefulWidget {
   @override
   State<TypewriterText> createState() => _TypewriterTextState();
 }
+
 class _TypewriterTextState extends State<TypewriterText> {
   String displayedText = "";
   int charIndex = 0;
   Timer? _timer;
+
   @override
-  void initState() { super.initState(); _type(); }
+  void initState() { 
+    super.initState(); 
+    _type(); 
+  }
+
+  // NEU: Setzt die Animation bei einer neuen Frage zurück.
   @override
-  void dispose() { _timer?.cancel(); super.dispose(); }
+  void didUpdateWidget(TypewriterText oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.text != widget.text) {
+      _timer?.cancel();
+      setState(() {
+        displayedText = "";
+        charIndex = 0;
+      });
+      _type();
+    }
+  }
+
+  @override
+  void dispose() { 
+    _timer?.cancel(); 
+    super.dispose(); 
+  }
+
   void _type() {
     _timer = Timer.periodic(const Duration(milliseconds: 30), (timer) {
       if (charIndex < widget.text.length && mounted) { 
@@ -32,6 +56,7 @@ class _TypewriterTextState extends State<TypewriterText> {
       }
     });
   }
+
   @override
   Widget build(BuildContext context) => Text(displayedText + (charIndex < widget.text.length ? "_" : ""), style: widget.style);
 }
@@ -150,7 +175,7 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
   int _aktuelleStreak = 0; bool _zeigeVader = false; String _vaderSpruch = ''; String _vaderGifPath = ''; 
   bool _showErrorFlash = false;
 
-  final List<String> _vaderLobGifs = ['assets/vader_lob.gif', 'assets/vader_lob2.gif', 'assets/vader_lob3r.gif'];
+  final List<String> _vaderLobGifs = ['assets/vader_lob.gif', 'assets/vader_lob2.gif', 'assets/vader_lob3.gif'];
   final List<String> _vaderKritikGifs = ['assets/vader_kritik.gif', 'assets/vader_kritik2.gif', 'assets/vader_kritik3.gif'];
   final List<String> _vaderLob = ["Die Macht ist stark in dir!", "Beeindruckend.", "Du hast dein Schicksal akzeptiert.", "Die IT-Macht gehorcht dir gut."];
   final List<String> _vaderKritik = ["Ich finde deinen Mangel an Wissen beklagenswert.", "Du hast mich zum letzten Mal enttäuscht.", "Noch bist du kein Jedi-Meister."];
