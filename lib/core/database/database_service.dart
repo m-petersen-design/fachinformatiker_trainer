@@ -1,5 +1,7 @@
+import 'dart:convert'; // Für jsonDecode
 import 'dart:io';
-import 'package:flutter/foundation.dart'; // NEU: Für debugPrint
+import 'package:flutter/foundation.dart'; 
+import 'package:flutter/services.dart'; // NEU: Ermöglicht das Laden von Assets via rootBundle
 import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -10,8 +12,10 @@ class DatabaseService {
   Database? _database;
 
   Future<Database> get database async {
-    if (_database != null) return _database!;
-    _database = await _initDB('fachinformatiker_v10.db');
+    if (_database != null) {
+      return _database!;
+    }
+    _database = await _initDB('fachinformatiker_v11.db');
     return _database!;
   }
 
@@ -35,6 +39,7 @@ class DatabaseService {
   }
 
   Future _createDB(Database db, int version) async {
+    // 1. Tabellen-Strukturen erstellen
     await db.execute('''
       CREATE TABLE fachrichtung (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -103,10 +108,12 @@ class DatabaseService {
       )
     ''');
 
+    // Indizes für maximale Performance anlegen
     await db.execute('CREATE INDEX idx_themengebiet_fachrichtung ON themengebiet(fachrichtung_id)');
     await db.execute('CREATE INDEX idx_frage_themengebiet ON frage(themengebiet_id)');
     await db.execute('CREATE INDEX idx_antwort_frage ON antwort_option(frage_id)');
 
+    // 2. Standard-Kategorien (Stammdaten) injizieren
     await db.execute("INSERT INTO fachrichtung (kuerzel, name, xp) VALUES ('FISI', 'Systemintegration', 0)");
     await db.execute("INSERT INTO fachrichtung (kuerzel, name, xp) VALUES ('FIAE', 'Anwendungsentwicklung', 0)");
     await db.execute("INSERT INTO fachrichtung (kuerzel, name, xp) VALUES ('FIDP', 'Daten- und Prozessanalyse', 0)");
@@ -121,6 +128,52 @@ class DatabaseService {
     await db.execute("INSERT INTO themengebiet (fachrichtung_id, name) VALUES (4, 'Theoretische Informatik (UNI)')");
     await db.execute("INSERT INTO themengebiet (fachrichtung_id, name) VALUES (4, 'Höhere Mathematik (UNI)')");
     await db.execute("INSERT INTO themengebiet (fachrichtung_id, name) VALUES (5, 'Wirtschaft & Sozialkunde (BS)')");
+
+    // 3. AUTOMATISCHER EINBAU: JSON-Fragenkatalog parsen und einspielen
+    try {
+      // Lädt die Datei direkt aus den App-Ressourcen
+      final String jsonString = await rootBundle.loadString('assets/basis_fragen.json');
+      final dynamic decodedData = jsonDecode(jsonString);
+      
+      List<dynamic> fragenListe = [];
+      if (decodedData is List) {
+        fragenListe = decodedData;
+      } else if (decodedData is Map && decodedData.containsKey('fragen')) {
+        fragenListe = decodedData['fragen'];
+      }
+
+      // Schleife über alle Fragen im JSON
+      for (var rawFrage in fragenListe) {
+        final frage = Map<String, dynamic>.from(rawFrage);
+        
+        // Frage in die Tabelle einfügen und die automatisch generierte ID abfangen
+        final int frageId = await db.insert('frage', {
+          'themengebiet_id': frage['themengebiet_id'] ?? 1,
+          'frage_text': frage['frage_text'] ?? '',
+          'typ': frage['typ'] ?? 'multiple_choice',
+          'bild_pfad': frage['bild_pfad'],
+          'erklaerung': frage['erklaerung'],
+          'schwierigkeit': frage['schwierigkeit'] ?? 1,
+        });
+
+        // Wenn die Frage Antwortoptionen besitzt (Multiple Choice), diese einspeisen
+        if (frage['antworten'] != null) {
+          final antworten = List<dynamic>.from(frage['antworten']);
+          for (var rawAntwort in antworten) {
+            final antwort = Map<String, dynamic>.from(rawAntwort);
+            await db.insert('antwort_option', {
+              'frage_id': frageId,
+              'text': antwort['text'] ?? '',
+              'ist_korrekt': antwort['ist_korrekt'] ?? 0,
+              'reihenfolge': antwort['reihenfolge'] ?? 0,
+            });
+          }
+        }
+      }
+      debugPrint("✅ Erststart-Aktion: basis_fragen.json erfolgreich in neue DB migriert!");
+    } catch (e) {
+      debugPrint("❌ Warnung beim automatischen JSON-Import: $e");
+    }
 
     debugPrint("✅ Neue DB (v10) mit Spaced Repetition erfolgreich erstellt!");
   }

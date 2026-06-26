@@ -150,8 +150,8 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
   int _aktuelleStreak = 0; bool _zeigeVader = false; String _vaderSpruch = ''; String _vaderGifPath = ''; 
   bool _showErrorFlash = false;
 
-  final List<String> _vaderLobGifs = ['assets/vader_lob.gif', 'assets/vader_lob_1.gif', 'assets/vader_lob_2.gif'];
-  final List<String> _vaderKritikGifs = ['assets/vader_kritik.gif', 'assets/vader_kritik_1.gif'];
+  final List<String> _vaderLobGifs = ['assets/vader_lob.gif', 'assets/vader_lob2.gif', 'assets/vader_lob3r.gif'];
+  final List<String> _vaderKritikGifs = ['assets/vader_kritik.gif', 'assets/vader_kritik2.gif', 'assets/vader_kritik3.gif'];
   final List<String> _vaderLob = ["Die Macht ist stark in dir!", "Beeindruckend.", "Du hast dein Schicksal akzeptiert.", "Die IT-Macht gehorcht dir gut."];
   final List<String> _vaderKritik = ["Ich finde deinen Mangel an Wissen beklagenswert.", "Du hast mich zum letzten Mal enttäuscht.", "Noch bist du kein Jedi-Meister."];
 
