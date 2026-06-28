@@ -18,3 +18,13 @@ samples, guidance on mobile development, and a full API reference.
 
 test
 
+
+
+
+
+
+
+
+
+
+Diese App wurde von Max Petersen entwickelt.
