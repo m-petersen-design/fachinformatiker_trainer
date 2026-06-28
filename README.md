@@ -27,4 +27,4 @@ test
 
 
 
-Diese App wurde von Max Petersen entwickelt.
+Diese App wurde von annonymen Entwicklern entwickelt.
