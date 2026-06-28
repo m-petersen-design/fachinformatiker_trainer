@@ -16,8 +16,7 @@ For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
-## Über dieses Projekt
-Der Fachinformatiker Trainer ist eine Flutter-App zum Üben von Prüfungsfragen.
+test
 
 
 
@@ -27,4 +26,5 @@ Der Fachinformatiker Trainer ist eine Flutter-App zum Üben von Prüfungsfragen.
 
 
 
-Diese App wurde von Max Petersen entwickelt.
+
+Diese App wurde von annonymen Entwicklern entwickelt.
