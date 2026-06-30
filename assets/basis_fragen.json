@@ -38,10 +38,22 @@
     "bild_pfad": null,
     "erklaerung": "Auszubildende zur Verschwiegenheit zu verpflichten, ist Standard und zulässig. Alle anderen Punkte (kein Berichtsheft, späte Zahlung, Zwangsübernahme) verstoßen gegen das Berufsbildungsgesetz.",
     "antworten": [
-      {"text": "Frau Müller muss keinen Ausbildungsnachweis (Berichtsheft) führen.", "ist_korrekt": 0},
-      {"text": "Die Ausbildungsvergütung wird erst in den ersten beiden Wochen des Folgemonats gezahlt.", "ist_korrekt": 0},
-      {"text": "Frau Müller verpflichtet sich zum Stillschweigen über Betriebsgeheimnisse.", "ist_korrekt": 1},
-      {"text": "Ein Jobangebot zur Weiterbeschäftigung muss bei bestandener Prüfung angenommen werden.", "ist_korrekt": 0}
+      {
+        "text": "Frau Müller muss keinen Ausbildungsnachweis (Berichtsheft) führen.",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Die Ausbildungsvergütung wird erst in den ersten beiden Wochen des Folgemonats gezahlt.",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Frau Müller verpflichtet sich zum Stillschweigen über Betriebsgeheimnisse.",
+        "ist_korrekt": 1
+      },
+      {
+        "text": "Ein Jobangebot zur Weiterbeschäftigung muss bei bestandener Prüfung angenommen werden.",
+        "ist_korrekt": 0
+      }
     ]
   },
   {
@@ -51,10 +63,22 @@
     "bild_pfad": null,
     "erklaerung": "Gemäß BBiG führt eine unzulässige Klausel (Teilnichtigkeit) nicht dazu, dass der gesamte Vertrag ungültig wird. Nur die spezifische Klausel verliert ihre Gültigkeit.",
     "antworten": [
-      {"text": "Der gesamte Berufsausbildungsvertrag ist nichtig.", "ist_korrekt": 0},
-      {"text": "Die betroffene Vereinbarung ist nichtig, der restliche Vertrag bleibt gültig.", "ist_korrekt": 1},
-      {"text": "Der Vertrag ist gültig, wenn die IHK zustimmt.", "ist_korrekt": 0},
-      {"text": "Der Vertrag ist gültig, wenn Frau Müller ausdrücklich zustimmt.", "ist_korrekt": 0}
+      {
+        "text": "Der gesamte Berufsausbildungsvertrag ist nichtig.",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Die betroffene Vereinbarung ist nichtig, der restliche Vertrag bleibt gültig.",
+        "ist_korrekt": 1
+      },
+      {
+        "text": "Der Vertrag ist gültig, wenn die IHK zustimmt.",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Der Vertrag ist gültig, wenn Frau Müller ausdrücklich zustimmt.",
+        "ist_korrekt": 0
+      }
     ]
   },
   {
@@ -64,14 +88,24 @@
     "bild_pfad": null,
     "erklaerung": "Laut § 10 und § 11 BBiG muss der Vertrag unverzüglich nach Abschluss, spätestens jedoch vor Beginn der Berufsausbildung schriftlich niedergelegt werden.",
     "antworten": [
-      {"text": "Am ersten Werktag im September", "ist_korrekt": 0},
-      {"text": "Am 31.08. bzw. unmittelbar vor Ausbildungsbeginn", "ist_korrekt": 1},
-      {"text": "Nach Ablauf der Probezeit", "ist_korrekt": 0},
-      {"text": "Bis zum Beginn des Berufsschulunterrichts", "ist_korrekt": 0}
+      {
+        "text": "Am ersten Werktag im September",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Am 31.08. bzw. unmittelbar vor Ausbildungsbeginn",
+        "ist_korrekt": 1
+      },
+      {
+        "text": "Nach Ablauf der Probezeit",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Bis zum Beginn des Berufsschulunterrichts",
+        "ist_korrekt": 0
+      }
     ]
   },
-
-
   {
     "themengebiet_id": 2,
     "frage_text": "Unter welchen Voraussetzungen dürfen die Kundendaten eines Webshops unter Berücksichtigung des Datenschutzes in einer Public Cloud gespeichert werden?",
@@ -95,10 +129,22 @@
     "bild_pfad": null,
     "erklaerung": "In nahezu allen Konsolen und Terminals sendet die Tastenkombination Strg + C (Ctrl+C) das Interrupt-Signal (SIGINT) an den laufenden Prozess und zwingt ihn zum Abbruch.",
     "antworten": [
-      {"text": "Durch Drücken der Taste F12", "ist_korrekt": 0},
-      {"text": "Durch die Eingabe des Befehls 'shutdown -p'", "ist_korrekt": 0},
-      {"text": "Durch die Tastenkombination Strg + C (Ctrl + C)", "ist_korrekt": 1},
-      {"text": "Durch die Tastenkombination Alt + F4", "ist_korrekt": 0}
+      {
+        "text": "Durch Drücken der Taste F12",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Durch die Eingabe des Befehls 'shutdown -p'",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Durch die Tastenkombination Strg + C (Ctrl + C)",
+        "ist_korrekt": 1
+      },
+      {
+        "text": "Durch die Tastenkombination Alt + F4",
+        "ist_korrekt": 0
+      }
     ]
   },
   {
@@ -108,10 +154,22 @@
     "bild_pfad": null,
     "erklaerung": "Zwei unterschiedliche Anbindungen (am besten über zwei verschiedene Provider und Medien, z.B. Glasfaser und 5G) sorgen für Redundanz. Fällt ein Provider aus (z.B. durch einen Baggerbiss), übernimmt die zweite Leitung nahtlos (Failover).",
     "antworten": [
-      {"text": "Zur Reduzierung der monatlichen Internetkosten.", "ist_korrekt": 0},
-      {"text": "Um Viren und Malware auf der zweiten Leitung in Quarantäne zu verschieben.", "ist_korrekt": 0},
-      {"text": "Zur Erhöhung der Ausfallsicherheit (Redundanz / Failover).", "ist_korrekt": 1},
-      {"text": "Weil IPv4 und IPv6 niemals über dieselbe Leitung übertragen werden können.", "ist_korrekt": 0}
+      {
+        "text": "Zur Reduzierung der monatlichen Internetkosten.",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Um Viren und Malware auf der zweiten Leitung in Quarantäne zu verschieben.",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Zur Erhöhung der Ausfallsicherheit (Redundanz / Failover).",
+        "ist_korrekt": 1
+      },
+      {
+        "text": "Weil IPv4 und IPv6 niemals über dieselbe Leitung übertragen werden können.",
+        "ist_korrekt": 0
+      }
     ]
   },
   {
@@ -161,10 +219,22 @@
     "bild_pfad": null,
     "erklaerung": "Einfache Port-Security beschränkt nur die Anzahl oder spezifische Quell-MAC-Adressen an einem Port. Wenn der Angreifer jedoch legitimen Zugang hat, kann er trotzdem manipulierte ARP-Pakete (mit seiner erlaubten MAC, aber falschen IPs) senden. Um ARP-Poisoning zu stoppen, benötigt man Funktionen wie 'Dynamic ARP Inspection' (DAI).",
     "antworten": [
-      {"text": "Ja, Port-Security blockiert automatisch alle schädlichen ARP-Antworten.", "ist_korrekt": 0},
-      {"text": "Nein, einfache Port-Security prüft nur MAC-Adressen und nicht den Inhalt von ARP-Paketen.", "ist_korrekt": 1},
-      {"text": "Ja, weil ARP ausschließlich auf Layer 4 arbeitet und Port-Security das filtert.", "ist_korrekt": 0},
-      {"text": "Nein, ARP-Poisoning kann generell nur durch Antiviren-Software auf dem Client blockiert werden.", "ist_korrekt": 0}
+      {
+        "text": "Ja, Port-Security blockiert automatisch alle schädlichen ARP-Antworten.",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Nein, einfache Port-Security prüft nur MAC-Adressen und nicht den Inhalt von ARP-Paketen.",
+        "ist_korrekt": 1
+      },
+      {
+        "text": "Ja, weil ARP ausschließlich auf Layer 4 arbeitet und Port-Security das filtert.",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Nein, ARP-Poisoning kann generell nur durch Antiviren-Software auf dem Client blockiert werden.",
+        "ist_korrekt": 0
+      }
     ]
   },
   {
@@ -174,9 +244,7 @@
     "bild_pfad": null,
     "erklaerung": "Sobald eine nicht-autorisierte MAC-Adresse Frames über den Port sendet, wird der Port sofort vollständig deaktiviert (err-disabled). Keine Daten können mehr fließen. Der Port bleibt dauerhaft in diesem Shutdown-Zustand, bis ein Administrator den Fehler quittiert und den Port manuell (z.B. per 'shutdown' und 'no shutdown') reaktiviert.",
     "antworten": []
-    },
-
-
+  },
   {
     "themengebiet_id": 3,
     "frage_text": "Entwickeln Sie eine Methode 'erzeugeKuhData', die für jede Kuh ein Objekt der Klasse KuhData erzeugt, einer Liste hinzufügt und diese zurückgibt.",
@@ -200,10 +268,22 @@
     "bild_pfad": null,
     "erklaerung": "Dies ist die Polymorphie (Late Binding). Das Programm prüft zur Laufzeit den tatsächlichen Typ des Objekts und führt die dafür spezifische Implementierung der Methode aus, nicht die der Basisklasse.",
     "antworten": [
-      {"text": "Statische Typisierung", "ist_korrekt": 0},
-      {"text": "Polymorphie (Dynamic Binding)", "ist_korrekt": 1},
-      {"text": "Kapselung", "ist_korrekt": 0},
-      {"text": "Datenabstraktion", "ist_korrekt": 0}
+      {
+        "text": "Statische Typisierung",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Polymorphie (Dynamic Binding)",
+        "ist_korrekt": 1
+      },
+      {
+        "text": "Kapselung",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Datenabstraktion",
+        "ist_korrekt": 0
+      }
     ]
   },
   {
@@ -261,10 +341,22 @@
     "bild_pfad": null,
     "erklaerung": "PUT wird verwendet, um eine Ressource unter der angegebenen URL komplett zu ersetzen oder neu anzulegen.",
     "antworten": [
-      {"text": "GET", "ist_korrekt": 0},
-      {"text": "POST", "ist_korrekt": 0},
-      {"text": "PUT", "ist_korrekt": 1},
-      {"text": "DELETE", "ist_korrekt": 0}
+      {
+        "text": "GET",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "POST",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "PUT",
+        "ist_korrekt": 1
+      },
+      {
+        "text": "DELETE",
+        "ist_korrekt": 0
+      }
     ]
   },
   {
@@ -274,10 +366,22 @@
     "bild_pfad": null,
     "erklaerung": "Der kritische Pfad ist die längste Kette von Aktivitäten im Netzplan. Jede Verzögerung auf diesem Pfad führt direkt zu einer Verzögerung des gesamten Projektabschlusses.",
     "antworten": [
-      {"text": "Die günstigste Route durch das Projekt", "ist_korrekt": 0},
-      {"text": "Die längste Kette von Vorgängen, bei denen kein Puffer vorhanden ist", "ist_korrekt": 1},
-      {"text": "Der Pfad mit den meisten Fehlern", "ist_korrekt": 0},
-      {"text": "Die Verbindung der Aufgaben mit dem größten Puffer", "ist_korrekt": 0}
+      {
+        "text": "Die günstigste Route durch das Projekt",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Die längste Kette von Vorgängen, bei denen kein Puffer vorhanden ist",
+        "ist_korrekt": 1
+      },
+      {
+        "text": "Der Pfad mit den meisten Fehlern",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Die Verbindung der Aufgaben mit dem größten Puffer",
+        "ist_korrekt": 0
+      }
     ]
   },
   {
@@ -287,15 +391,24 @@
     "bild_pfad": null,
     "erklaerung": "RPO beschreibt den maximal akzeptablen Datenverlust. Ein RPO von 2h bedeutet, dass im Ernstfall maximal Daten der letzten 2 Stunden verloren gehen dürfen.",
     "antworten": [
-      {"text": "Die Wiederherstellung dauert 2 Stunden", "ist_korrekt": 0},
-      {"text": "Es dürfen maximal Daten der letzten 2 Stunden verloren gehen", "ist_korrekt": 1},
-      {"text": "Das System muss nach 2 Stunden wieder laufen", "ist_korrekt": 0},
-      {"text": "Backups werden alle 2 Stunden gelöscht", "ist_korrekt": 0}
+      {
+        "text": "Die Wiederherstellung dauert 2 Stunden",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Es dürfen maximal Daten der letzten 2 Stunden verloren gehen",
+        "ist_korrekt": 1
+      },
+      {
+        "text": "Das System muss nach 2 Stunden wieder laufen",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Backups werden alle 2 Stunden gelöscht",
+        "ist_korrekt": 0
+      }
     ]
   },
-
-
-
   {
     "themengebiet_id": 5,
     "frage_text": "Beschreiben Sie den Unterschied zwischen einem 'Ereignis' und einer 'Funktion' in einer EPK.",
@@ -343,10 +456,22 @@
     "bild_pfad": null,
     "erklaerung": "Besondere Daten (Art. 9 DSGVO) sind z.B. Gesundheitsdaten, ethnische Herkunft, politische Meinungen oder religiöse Überzeugungen. Diese unterliegen einem strengeren Schutz.",
     "antworten": [
-      {"text": "Anschrift und E-Mail-Adresse", "ist_korrekt": 0},
-      {"text": "IP-Adresse", "ist_korrekt": 0},
-      {"text": "Gesundheitsdaten", "ist_korrekt": 1},
-      {"text": "Bankverbindung", "ist_korrekt": 0}
+      {
+        "text": "Anschrift und E-Mail-Adresse",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "IP-Adresse",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Gesundheitsdaten",
+        "ist_korrekt": 1
+      },
+      {
+        "text": "Bankverbindung",
+        "ist_korrekt": 0
+      }
     ]
   },
   {
@@ -356,15 +481,24 @@
     "bild_pfad": null,
     "erklaerung": "Data Mining zielt darauf ab, in großen Datenmengen verborgene Muster, Zusammenhänge oder Trends zu entdecken, die für strategische Entscheidungen genutzt werden können.",
     "antworten": [
-      {"text": "Die manuelle Dateneingabe beschleunigen", "ist_korrekt": 0},
-      {"text": "Die Entdeckung von verborgenen Mustern und Zusammenhängen in Daten", "ist_korrekt": 1},
-      {"text": "Die Sicherung von Daten gegen Hackerangriffe", "ist_korrekt": 0},
-      {"text": "Die Verschlüsselung von E-Mail-Kommunikation", "ist_korrekt": 0}
+      {
+        "text": "Die manuelle Dateneingabe beschleunigen",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Die Entdeckung von verborgenen Mustern und Zusammenhängen in Daten",
+        "ist_korrekt": 1
+      },
+      {
+        "text": "Die Sicherung von Daten gegen Hackerangriffe",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Die Verschlüsselung von E-Mail-Kommunikation",
+        "ist_korrekt": 0
+      }
     ]
   },
-
-
-
   {
     "themengebiet_id": 1,
     "frage_text": "Bringen Sie die folgenden Schritte nach einem Arbeitsunfall in die richtige Reihenfolge.",
@@ -396,10 +530,22 @@
     "bild_pfad": null,
     "erklaerung": "Ökologische Ziele befassen sich mit dem Umweltschutz, z.B. Reduktion des CO2-Ausstoßes, sparsamer Energieverbrauch oder Abfallvermeidung.",
     "antworten": [
-      {"text": "Maximierung des Gewinns", "ist_korrekt": 0},
-      {"text": "Reduzierung des Energieverbrauchs", "ist_korrekt": 1},
-      {"text": "Steigerung der Mitarbeiterzufriedenheit", "ist_korrekt": 0},
-      {"text": "Marktführerschaft bei IT-Dienstleistungen", "ist_korrekt": 0}
+      {
+        "text": "Maximierung des Gewinns",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Reduzierung des Energieverbrauchs",
+        "ist_korrekt": 1
+      },
+      {
+        "text": "Steigerung der Mitarbeiterzufriedenheit",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Marktführerschaft bei IT-Dienstleistungen",
+        "ist_korrekt": 0
+      }
     ]
   },
   {
@@ -409,10 +555,22 @@
     "bild_pfad": null,
     "erklaerung": "Der Blaue Engel ist ein staatliches Siegel für besonders umweltschonende Produkte und Dienstleistungen.",
     "antworten": [
-      {"text": "Es ist ein privates Siegel für Luxusartikel", "ist_korrekt": 0},
-      {"text": "Es kennzeichnet besonders umweltschonende Produkte", "ist_korrekt": 1},
-      {"text": "Es ist ein Siegel für faire Bezahlung der Mitarbeiter", "ist_korrekt": 0},
-      {"text": "Es garantiert, dass ein Produkt nicht im Ausland produziert wurde", "ist_korrekt": 0}
+      {
+        "text": "Es ist ein privates Siegel für Luxusartikel",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Es kennzeichnet besonders umweltschonende Produkte",
+        "ist_korrekt": 1
+      },
+      {
+        "text": "Es ist ein Siegel für faire Bezahlung der Mitarbeiter",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Es garantiert, dass ein Produkt nicht im Ausland produziert wurde",
+        "ist_korrekt": 0
+      }
     ]
   },
   {
@@ -431,9 +589,6 @@
     "erklaerung": "1. Bruttolohnkosten. 2. Sozialversicherungsbeiträge (AG-Anteil). 3. Gemeinkosten (Miete, Strom, IT). 4. Gewinnzuschlag. 5. Wagnisaufschlag.",
     "antworten": []
   },
-
-
-
   {
     "themengebiet_id": 0,
     "frage_text": "Welche FSMO-Rolle (Flexible Single Master Operations) ist innerhalb einer gesamten Active Directory Gesamtstruktur (Forest) einzigartig und darf nur ein einziges Mal existieren?",
@@ -441,10 +596,22 @@
     "bild_pfad": null,
     "erklaerung": "Der Schema-Master und der Domänenbennennungs-Master existieren nur einmal pro Gesamtstruktur (Forest). Die Rollen RID-Master, PDC-Emulator und Infrastruktur-Master existieren hingegen einmal pro Domäne.",
     "antworten": [
-      {"text": "RID-Master", "ist_korrekt": 0},
-      {"text": "PDC-Emulator", "ist_korrekt": 0},
-      {"text": "Schema-Master", "ist_korrekt": 1},
-      {"text": "Infrastruktur-Master", "ist_korrekt": 0}
+      {
+        "text": "RID-Master",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "PDC-Emulator",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Schema-Master",
+        "ist_korrekt": 1
+      },
+      {
+        "text": "Infrastruktur-Master",
+        "ist_korrekt": 0
+      }
     ]
   },
   {
@@ -462,10 +629,22 @@
     "bild_pfad": null,
     "erklaerung": "Kerberos v5 ist das primäre Authentifizierungsprotokoll in modernen Windows-Domänen und kommuniziert über den Port 88 (TCP/UDP). LDAP nutzt Port 389 und dient der Verzeichnisabfrage.",
     "antworten": [
-      {"text": "LDAP auf Port 389", "ist_korrekt": 0},
-      {"text": "Kerberos auf Port 88", "ist_korrekt": 1},
-      {"text": "SMB auf Port 445", "ist_korrekt": 0},
-      {"text": "NTLM auf Port 139", "ist_korrekt": 0}
+      {
+        "text": "LDAP auf Port 389",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "Kerberos auf Port 88",
+        "ist_korrekt": 1
+      },
+      {
+        "text": "SMB auf Port 445",
+        "ist_korrekt": 0
+      },
+      {
+        "text": "NTLM auf Port 139",
+        "ist_korrekt": 0
+      }
     ]
   },
   {
@@ -475,5 +654,108 @@
     "bild_pfad": null,
     "erklaerung": "Der Globale Katalog (GC) ist ein Domänencontroller, der eine schreibgeschützte Teilkopie aller Objekte aus allen Domänen der Gesamtstruktur speichert. Er ermöglicht Benutzern und Anwendungen eine schnelle, domänenübergreifende Suche nach Ressourcen (wie Benutzern, Gruppen oder Druckern), ohne dass direkte Abfragen an die spezifischen Herkunftsdomänen gesendet werden müssen.",
     "antworten": []
+  },
+  {
+    "themengebiet_id": 9,
+    "frage_text": "Welche SQL-Anweisung wird verwendet, um Daten aus einer Tabelle (einer Datenquelle) auszulesen?",
+    "typ": "multiple_choice",
+    "bild_pfad": null,
+    "erklaerung": "Mit SELECT werden Daten aus einer oder mehreren Tabellen einer Datenbank abgefragt (erfasst).",
+    "antworten": [
+      {
+        "text": "SELECT",
+        "ist_korrekt": 1,
+        "reihenfolge": 1
+      },
+      {
+        "text": "INSERT",
+        "ist_korrekt": 0,
+        "reihenfolge": 2
+      },
+      {
+        "text": "UPDATE",
+        "ist_korrekt": 0,
+        "reihenfolge": 3
+      },
+      {
+        "text": "DELETE",
+        "ist_korrekt": 0,
+        "reihenfolge": 4
+      }
+    ]
+  },
+  {
+    "themengebiet_id": 9,
+    "frage_text": "Nennen Sie drei typische Datenquellen, aus denen ein Unternehmen Daten erfassen kann.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Z. B.: relationale Datenbanken, CSV/Excel-Dateien, APIs/Webservices, Sensoren, Formulareingaben.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 9,
+    "frage_text": "Ein häufig genutztes, plattformunabhängiges Dateiformat zum Austausch tabellarischer Daten zwischen verschiedenen Datenquellen ist CSV. Wofür steht CSV?",
+    "typ": "multiple_choice",
+    "bild_pfad": null,
+    "erklaerung": "CSV steht für 'Comma-Separated Values'.",
+    "antworten": [
+      {
+        "text": "Comma-Separated Values",
+        "ist_korrekt": 1,
+        "reihenfolge": 1
+      },
+      {
+        "text": "Centralized System Values",
+        "ist_korrekt": 0,
+        "reihenfolge": 2
+      },
+      {
+        "text": "Column Structured Variables",
+        "ist_korrekt": 0,
+        "reihenfolge": 3
+      },
+      {
+        "text": "Compressed Storage Volume",
+        "ist_korrekt": 0,
+        "reihenfolge": 4
+      }
+    ]
+  },
+  {
+    "themengebiet_id": 9,
+    "frage_text": "Erläutern Sie kurz, was eine REST-API als Datenquelle auszeichnet und welches Datenformat dabei häufig zur Datenerfassung übertragen wird.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Eine REST-API stellt Daten über HTTP-Methoden bereit, häufig im Format JSON.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 9,
+    "frage_text": "Bevor erfasste Rohdaten aus einer Datenquelle weiterverarbeitet werden, sollten sie zunächst auf welche Eigenschaft hin geprüft werden, um spätere Fehler in der Auswertung zu vermeiden?",
+    "typ": "multiple_choice",
+    "bild_pfad": null,
+    "erklaerung": "Erfasste Rohdaten sollten zunächst auf Datenqualität geprüft werden.",
+    "antworten": [
+      {
+        "text": "Datenqualität (Vollständigkeit, Konsistenz, Plausibilität)",
+        "ist_korrekt": 1,
+        "reihenfolge": 1
+      },
+      {
+        "text": "Die Dateigröße in Megabyte",
+        "ist_korrekt": 0,
+        "reihenfolge": 2
+      },
+      {
+        "text": "Die Bildschirmauflösung des Erfassungsgeräts",
+        "ist_korrekt": 0,
+        "reihenfolge": 3
+      },
+      {
+        "text": "Die Anzahl der installierten Schriftarten",
+        "ist_korrekt": 0,
+        "reihenfolge": 4
+      }
+    ]
   }
 ]
