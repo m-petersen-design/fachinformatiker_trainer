@@ -176,6 +176,52 @@ class DatabaseService {
       debugPrint("❌ Warnung beim automatischen JSON-Import: $e");
     }
 
+    // 3. AUTOMATISCHER EINBAU: JSON-Fragenkatalog parsen und einspielen
+    try {
+      // Lädt die Datei direkt aus den App-Ressourcen
+      final String jsonString = await rootBundle.loadString('assets/basis_fragen.json');
+      final dynamic decodedData = jsonDecode(jsonString);
+      
+      List<dynamic> fragenListe = [];
+      if (decodedData is List) {
+        fragenListe = decodedData;
+      } else if (decodedData is Map && decodedData.containsKey('fragen')) {
+        fragenListe = decodedData['fragen'];
+      }
+
+      // Schleife über alle Fragen im JSON
+      for (var rawFrage in fragenListe) {
+        final frage = Map<String, dynamic>.from(rawFrage);
+        
+        // Frage in die Tabelle einfügen und die automatisch generierte ID abfangen
+        final int frageId = await db.insert('frage', {
+          'themengebiet_id': frage['themengebiet_id'] ?? 1,
+          'frage_text': frage['frage_text'] ?? '',
+          'typ': frage['typ'] ?? 'multiple_choice',
+          'bild_pfad': frage['bild_pfad'],
+          'erklaerung': frage['erklaerung'],
+          'schwierigkeit': frage['schwierigkeit'] ?? 1,
+        });
+
+        // Wenn die Frage Antwortoptionen besitzt (Multiple Choice), diese einspeisen
+        if (frage['antworten'] != null) {
+          final antworten = List<dynamic>.from(frage['antworten']);
+          for (var rawAntwort in antworten) {
+            final antwort = Map<String, dynamic>.from(rawAntwort);
+            await db.insert('antwort_option', {
+              'frage_id': frageId,
+              'text': antwort['text'] ?? '',
+              'ist_korrekt': antwort['ist_korrekt'] ?? 0,
+              'reihenfolge': antwort['reihenfolge'] ?? 0,
+            });
+          }
+        }
+      }
+      debugPrint("✅ Erststart-Aktion: basis_fragen.json erfolgreich in neue DB migriert!");
+    } catch (e) {
+      debugPrint("❌ Warnung beim automatischen JSON-Import: $e");
+    }
+
     debugPrint("✅ Neue DB (v10) mit Spaced Repetition erfolgreich erstellt!");
   }
 }
