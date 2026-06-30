@@ -660,7 +660,7 @@
     "frage_text": "Welche SQL-Anweisung wird verwendet, um Daten aus einer Tabelle (einer Datenquelle) auszulesen?",
     "typ": "multiple_choice",
     "bild_pfad": null,
-    "erklaerung": "Mit SELECT werden Daten aus einer oder mehreren Tabellen einer Datenbank abgefragt (erfasst). INSERT fügt neue Daten hinzu, UPDATE ändert bestehende Daten, DELETE entfernt Daten.",
+    "erklaerung": "Mit SELECT werden Daten aus einer oder mehreren Tabellen einer Datenbank abgefragt (erfasst).",
     "antworten": [
       {
         "text": "SELECT",
@@ -689,7 +689,7 @@
     "frage_text": "Nennen Sie drei typische Datenquellen, aus denen ein Unternehmen Daten erfassen kann.",
     "typ": "freitext",
     "bild_pfad": null,
-    "erklaerung": "Typische Datenquellen sind z. B.: relationale Datenbanken (SQL), CSV/Excel-Dateien, Webservices/APIs (z. B. REST), Sensoren/Messgeräte (IoT), Formulareingaben von Benutzern, externe Schnittstellen (z. B. CRM/ERP-Systeme).",
+    "erklaerung": "Z. B.: relationale Datenbanken, CSV/Excel-Dateien, APIs/Webservices, Sensoren, Formulareingaben.",
     "antworten": []
   },
   {
@@ -697,7 +697,7 @@
     "frage_text": "Ein häufig genutztes, plattformunabhängiges Dateiformat zum Austausch tabellarischer Daten zwischen verschiedenen Datenquellen ist CSV. Wofür steht CSV?",
     "typ": "multiple_choice",
     "bild_pfad": null,
-    "erklaerung": "CSV steht für 'Comma-Separated Values'. Es handelt sich um ein einfaches Textformat, bei dem Datensätze zeilenweise und Felder durch ein Trennzeichen (meist Komma oder Semikolon) getrennt gespeichert werden.",
+    "erklaerung": "CSV steht für 'Comma-Separated Values'.",
     "antworten": [
       {
         "text": "Comma-Separated Values",
@@ -726,7 +726,7 @@
     "frage_text": "Erläutern Sie kurz, was eine REST-API als Datenquelle auszeichnet und welches Datenformat dabei häufig zur Datenerfassung übertragen wird.",
     "typ": "freitext",
     "bild_pfad": null,
-    "erklaerung": "Eine REST-API stellt Daten über standardisierte HTTP-Methoden (z. B. GET zum Abrufen/Erfassen von Daten) bereit. Sie ist zustandslos und ressourcenorientiert. Zur Übertragung wird sehr häufig das Format JSON (manchmal auch XML) verwendet, da es leichtgewichtig und plattformunabhängig lesbar ist.",
+    "erklaerung": "Eine REST-API stellt Daten über HTTP-Methoden bereit, häufig im Format JSON.",
     "antworten": []
   },
   {
@@ -734,7 +734,7 @@
     "frage_text": "Bevor erfasste Rohdaten aus einer Datenquelle weiterverarbeitet werden, sollten sie zunächst auf welche Eigenschaft hin geprüft werden, um spätere Fehler in der Auswertung zu vermeiden?",
     "typ": "multiple_choice",
     "bild_pfad": null,
-    "erklaerung": "Erfasste Rohdaten sollten zunächst auf Datenqualität geprüft werden, u. a. auf Vollständigkeit, Konsistenz und Plausibilität (z. B. fehlende Werte, Duplikate, falsche Formate). Erst danach folgen Schritte wie Bereinigung, Transformation und Auswertung.",
+    "erklaerung": "Erfasste Rohdaten sollten zunächst auf Datenqualität geprüft werden.",
     "antworten": [
       {
         "text": "Datenqualität (Vollständigkeit, Konsistenz, Plausibilität)",
