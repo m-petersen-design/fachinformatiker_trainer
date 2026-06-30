@@ -11,8 +11,7 @@ class DatabaseService {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB('fachinformatiker_v10.db');
-    return _database!;
+      _database = await _initDB('fachinformatiker_v12.db');    return _database!;
   }
 
   Future<Database> _initDB(String filePath) async {
@@ -121,7 +120,7 @@ class DatabaseService {
     await db.execute("INSERT INTO themengebiet (fachrichtung_id, name) VALUES (4, 'Theoretische Informatik (UNI)')");
     await db.execute("INSERT INTO themengebiet (fachrichtung_id, name) VALUES (4, 'Höhere Mathematik (UNI)')");
     await db.execute("INSERT INTO themengebiet (fachrichtung_id, name) VALUES (5, 'Wirtschaft & Sozialkunde (BS)')");
-
+    await db.execute("INSERT INTO themengebiet (fachrichtung_id, name) VALUES (3, 'Datenerfassung & Datenquellen')");
     debugPrint("✅ Neue DB (v10) mit Spaced Repetition erfolgreich erstellt!");
   }
 }

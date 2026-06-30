@@ -1,0 +1,501 @@
+[
+  {
+    "themengebiet_id": 2,
+    "frage_text": "Ein Server soll gehärtet werden. Erläutern Sie zwei Einstellungen, mit denen Sie den Server bereits im UEFI/BIOS härten können.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "1. Setzen eines UEFI/BIOS-Passworts, um unbefugte Änderungen an der Hardware-Konfiguration zu verhindern.\n2. Deaktivieren nicht benötigter Schnittstellen (z.B. USB-Ports), um das Booten von fremden Medien oder Datendiebstahl zu unterbinden.\n3. Secure Boot aktivieren, um das Laden manipulierter Bootloader zu verhindern.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 1,
+    "frage_text": "Sie sollen einen neuen Webserver in Betrieb nehmen. Ihm fehlt ein Netzteil. Mainboard: 40W, 2x CPU je 90W, 8x RAM je 4W, 4x HDD je 10W, 2x Netzwerkkarte je 6W. Berechnen Sie den Leistungsbedarf inklusive 20% Puffer und 90% Wirkungsgrad. Geben Sie die nächste marktübliche Größe an (in 50W Schritten).",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Komponenten: 40 + 180 + 32 + 40 + 12 = 304 W.\nInklusive 20% Puffer: 304 * 1,2 = 364,8 W.\nBerücksichtigung Wirkungsgrad (90%): 364,8 / 0,9 = 405,33 W.\nNächste marktübliche Größe: 450 Watt.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 2,
+    "frage_text": "Nennen Sie zwei Beispiele für Technisch Organisatorische Maßnahmen (TOM), die Sie umsetzen, damit der Server und die Daten geschützt sind, und erläutern Sie deren Nutzen.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "1. Zutrittskontrolle (z.B. Chipkarte für den Serverraum): Verhindert physischen Zugriff auf Systeme und Diebstahl.\n2. Zugangskontrolle (z.B. sichere Passwörter / 2FA): Verhindert unberechtigte Anmeldungen an den Systemen.\n3. Zugriffskontrolle (z.B. Berechtigungskonzepte): Verhindert, dass angemeldete Nutzer Daten sehen, die sie nicht sehen dürfen.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 2,
+    "frage_text": "Nach der Installation eines Linux-Betriebssystems wird der Neustart mit der Meldung 'error: file not found. grub rescue>' abgebrochen. Erläutern Sie eine mögliche Ursache und die Fehlerbehebung.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Ursache: GRUB (der Bootloader) findet den Kernel oder die Boot-Partition nicht (z.B. falsche UUID in der config, Partition gelöscht oder verschoben).\nFehlerbehebung: System mit einem Live-Linux (USB-Stick) booten, in die Umgebung per chroot wechseln und GRUB neu installieren bzw. mit 'update-grub' die Konfiguration neu schreiben lassen.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 1,
+    "frage_text": "Frau Müller (18) möchte eine Ausbildung beginnen. Welche Vereinbarung im Ausbildungsvertrag ist rechtlich zulässig?",
+    "typ": "multiple_choice",
+    "bild_pfad": null,
+    "erklaerung": "Auszubildende zur Verschwiegenheit zu verpflichten, ist Standard und zulässig. Alle anderen Punkte (kein Berichtsheft, späte Zahlung, Zwangsübernahme) verstoßen gegen das Berufsbildungsgesetz.",
+    "antworten": [
+      {"text": "Frau Müller muss keinen Ausbildungsnachweis (Berichtsheft) führen.", "ist_korrekt": 0},
+      {"text": "Die Ausbildungsvergütung wird erst in den ersten beiden Wochen des Folgemonats gezahlt.", "ist_korrekt": 0},
+      {"text": "Frau Müller verpflichtet sich zum Stillschweigen über Betriebsgeheimnisse.", "ist_korrekt": 1},
+      {"text": "Ein Jobangebot zur Weiterbeschäftigung muss bei bestandener Prüfung angenommen werden.", "ist_korrekt": 0}
+    ]
+  },
+  {
+    "themengebiet_id": 1,
+    "frage_text": "Welche rechtlichen Folgen hätte eine unzulässige Vereinbarung für den restlichen Berufsausbildungsvertrag?",
+    "typ": "multiple_choice",
+    "bild_pfad": null,
+    "erklaerung": "Gemäß BBiG führt eine unzulässige Klausel (Teilnichtigkeit) nicht dazu, dass der gesamte Vertrag ungültig wird. Nur die spezifische Klausel verliert ihre Gültigkeit.",
+    "antworten": [
+      {"text": "Der gesamte Berufsausbildungsvertrag ist nichtig.", "ist_korrekt": 0},
+      {"text": "Die betroffene Vereinbarung ist nichtig, der restliche Vertrag bleibt gültig.", "ist_korrekt": 1},
+      {"text": "Der Vertrag ist gültig, wenn die IHK zustimmt.", "ist_korrekt": 0},
+      {"text": "Der Vertrag ist gültig, wenn Frau Müller ausdrücklich zustimmt.", "ist_korrekt": 0}
+    ]
+  },
+  {
+    "themengebiet_id": 1,
+    "frage_text": "Zu welchem Zeitpunkt muss der Ausbildungsvertrag (Beginn 01.09.) spätestens schriftlich abgeschlossen werden?",
+    "typ": "multiple_choice",
+    "bild_pfad": null,
+    "erklaerung": "Laut § 10 und § 11 BBiG muss der Vertrag unverzüglich nach Abschluss, spätestens jedoch vor Beginn der Berufsausbildung schriftlich niedergelegt werden.",
+    "antworten": [
+      {"text": "Am ersten Werktag im September", "ist_korrekt": 0},
+      {"text": "Am 31.08. bzw. unmittelbar vor Ausbildungsbeginn", "ist_korrekt": 1},
+      {"text": "Nach Ablauf der Probezeit", "ist_korrekt": 0},
+      {"text": "Bis zum Beginn des Berufsschulunterrichts", "ist_korrekt": 0}
+    ]
+  },
+
+
+  {
+    "themengebiet_id": 2,
+    "frage_text": "Unter welchen Voraussetzungen dürfen die Kundendaten eines Webshops unter Berücksichtigung des Datenschutzes in einer Public Cloud gespeichert werden?",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "1. Es muss ein Vertrag zur Auftragsverarbeitung (AVV) gemäß Art. 28 DSGVO mit dem Cloud-Anbieter geschlossen werden. 2. Der Serverstandort sollte idealerweise in der EU liegen oder es müssen Standardvertragsklauseln (SCCs) genutzt werden. 3. Die Daten müssen verschlüsselt gespeichert werden (Encryption at Rest).",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 2,
+    "frage_text": "Erläutern Sie zwei Merkmale bzw. Eigenschaften von Arrays, die für bzw. gegen ihre Verwendung sprechen.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Dafür: Sehr schneller Lesezugriff auf einzelne Elemente über den Index (O(1)). Geringer Speicher-Overhead im Vergleich zu komplexen Listen. Dagegen: Die Größe eines Arrays ist meist statisch (fest definiert) und kann nachträglich nicht einfach erweitert werden. Das Einfügen von Werten in der Mitte erfordert das Verschieben aller nachfolgenden Elemente.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 2,
+    "frage_text": "Erläutern Sie eine Möglichkeit, ein laufendes Endlos-Programm (z.B. ein Skript in der Konsole) im laufenden Betrieb hart zu beenden.",
+    "typ": "multiple_choice",
+    "bild_pfad": null,
+    "erklaerung": "In nahezu allen Konsolen und Terminals sendet die Tastenkombination Strg + C (Ctrl+C) das Interrupt-Signal (SIGINT) an den laufenden Prozess und zwingt ihn zum Abbruch.",
+    "antworten": [
+      {"text": "Durch Drücken der Taste F12", "ist_korrekt": 0},
+      {"text": "Durch die Eingabe des Befehls 'shutdown -p'", "ist_korrekt": 0},
+      {"text": "Durch die Tastenkombination Strg + C (Ctrl + C)", "ist_korrekt": 1},
+      {"text": "Durch die Tastenkombination Alt + F4", "ist_korrekt": 0}
+    ]
+  },
+  {
+    "themengebiet_id": 2,
+    "frage_text": "Erläutern Sie einen Grund, warum ein Unternehmen zwei unterschiedliche Anbindungen an das Internet im Einsatz haben sollte.",
+    "typ": "multiple_choice",
+    "bild_pfad": null,
+    "erklaerung": "Zwei unterschiedliche Anbindungen (am besten über zwei verschiedene Provider und Medien, z.B. Glasfaser und 5G) sorgen für Redundanz. Fällt ein Provider aus (z.B. durch einen Baggerbiss), übernimmt die zweite Leitung nahtlos (Failover).",
+    "antworten": [
+      {"text": "Zur Reduzierung der monatlichen Internetkosten.", "ist_korrekt": 0},
+      {"text": "Um Viren und Malware auf der zweiten Leitung in Quarantäne zu verschieben.", "ist_korrekt": 0},
+      {"text": "Zur Erhöhung der Ausfallsicherheit (Redundanz / Failover).", "ist_korrekt": 1},
+      {"text": "Weil IPv4 und IPv6 niemals über dieselbe Leitung übertragen werden können.", "ist_korrekt": 0}
+    ]
+  },
+  {
+    "themengebiet_id": 2,
+    "frage_text": "Erläutern Sie die Auswirkungen von 'Split-horizon DNS' beim Zugriff auf die Webseite aus Sicht eines Mitarbeiters im Admin-Team (intern) und aus Sicht eines Kunden (extern).",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Der externe Kunde fragt den öffentlichen DNS, bekommt die öffentliche IP der Firewall/des Reverse Proxys und wird von außen sicher nach innen geleitet. Der interne Admin fragt den internen DNS, bekommt direkt die lokale private IP des Webservers und greift ohne Umweg über die Firewall direkt auf den Server zu (schneller und entlastet das Routing).",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 2,
+    "frage_text": "Beschreiben Sie zwei Gründe, die ein Unternehmen bewogen haben könnten, DHCPv6 anstelle von SLAAC (Stateless Address Autoconfiguration) im Netzwerk einzusetzen.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "1. Zusatzparameter: SLAAC weist oft nur das Präfix und Routing-Infos zu. DHCPv6 kann wichtige Zusatzoptionen wie DNS-Server, NTP-Server oder Domain-Namen zentral verteilen. 2. Kontrolle & Protokollierung: Bei Stateful DHCPv6 behält der Server (bzw. Admin) den genauen Überblick, welche MAC-Adresse/Client aktuell welche IPv6-Adresse gemietet hat (wichtig für Audits und Firewall-Regeln).",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 2,
+    "frage_text": "Nennen Sie drei Aufgaben, für die ein Router mit integrierter Firewall im Netzwerk eingesetzt werden kann.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "1. Routing/NAT: Verbinden von verschiedenen Subnetzen und Network Address Translation für den Internetzugang. 2. Paketfilterung: Blockieren oder Erlauben von Traffic auf Basis von IP-Adressen und Ports. 3. VPN-Gateway: Bereitstellung sicherer IPsec- oder OpenVPN-Tunnel für externe Mitarbeiter.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 2,
+    "frage_text": "Beschreiben Sie zwei mögliche Bedrohungen im Netzwerk, gegen die ein Standard-Router mit Firewall keinen oder kaum Schutz bietet.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "1. Phishing / Social Engineering: Wenn ein Mitarbeiter freiwillig seine Zugangsdaten auf einer gefälschten Website eingibt, sieht die Firewall nur regulären HTTPS-Traffic. 2. Insider-Threats: Böswillige Handlungen von Mitarbeitern, die sich bereits rechtmäßig im internen Netz befinden.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 2,
+    "frage_text": "Erläutern Sie die beiden Switch-Konfigurationen 'Configured MAC Addresses' (Statisch) und 'Sticky MAC Addresses'.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Configured (Static): Der Administrator trägt die erlaubte MAC-Adresse für den Switch-Port manuell (fest getippt) in die Konfiguration ein. Sticky: Der Switch 'lernt' die erste MAC-Adresse, die an diesem Port angeschlossen wird, dynamisch, wandelt sie dann aber automatisch in einen statischen Eintrag in der Running-Config um, sodass sie 'kleben' bleibt.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 2,
+    "frage_text": "Erläutern Sie, ob durch die einfache Einführung von 'Port-Security' auf Switches ein ARP-Poisoning-Angriff verhindert werden kann.",
+    "typ": "multiple_choice",
+    "bild_pfad": null,
+    "erklaerung": "Einfache Port-Security beschränkt nur die Anzahl oder spezifische Quell-MAC-Adressen an einem Port. Wenn der Angreifer jedoch legitimen Zugang hat, kann er trotzdem manipulierte ARP-Pakete (mit seiner erlaubten MAC, aber falschen IPs) senden. Um ARP-Poisoning zu stoppen, benötigt man Funktionen wie 'Dynamic ARP Inspection' (DAI).",
+    "antworten": [
+      {"text": "Ja, Port-Security blockiert automatisch alle schädlichen ARP-Antworten.", "ist_korrekt": 0},
+      {"text": "Nein, einfache Port-Security prüft nur MAC-Adressen und nicht den Inhalt von ARP-Paketen.", "ist_korrekt": 1},
+      {"text": "Ja, weil ARP ausschließlich auf Layer 4 arbeitet und Port-Security das filtert.", "ist_korrekt": 0},
+      {"text": "Nein, ARP-Poisoning kann generell nur durch Antiviren-Software auf dem Client blockiert werden.", "ist_korrekt": 0}
+    ]
+  },
+  {
+    "themengebiet_id": 2,
+    "frage_text": "Erläutern Sie, wie ein Switch-Port bei aktiviertem 'Violation Mode: Shutdown' reagiert, wenn eine fremde MAC-Adresse erkannt wird, und wie lange dieser Zustand verbleibt.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Sobald eine nicht-autorisierte MAC-Adresse Frames über den Port sendet, wird der Port sofort vollständig deaktiviert (err-disabled). Keine Daten können mehr fließen. Der Port bleibt dauerhaft in diesem Shutdown-Zustand, bis ein Administrator den Fehler quittiert und den Port manuell (z.B. per 'shutdown' und 'no shutdown') reaktiviert.",
+    "antworten": []
+    },
+
+
+  {
+    "themengebiet_id": 3,
+    "frage_text": "Entwickeln Sie eine Methode 'erzeugeKuhData', die für jede Kuh ein Objekt der Klasse KuhData erzeugt, einer Liste hinzufügt und diese zurückgibt.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Pseudocode-Logik: Liste initialisieren, über die Datenquelle (z.B. Array oder DB-Ergebnis) iterieren, für jeden Eintrag 'KuhData' instanziieren, zur Liste 'add'-en und am Ende die Liste 'return'-en.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 3,
+    "frage_text": "Entwickeln Sie die Methode 'calcAvgLeistung', wobei ein gewünschter Zeitraum (start, ende) übergeben wird.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Logik: Variable 'summe = 0', 'anzahl = 0'. Schleife über Daten: Wenn Datum zwischen 'start' und 'ende', summiere Leistung auf und erhöhe 'anzahl'. Am Ende 'summe / anzahl' zurückgeben (Null-Prüfung für anzahl beachten!).",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 3,
+    "frage_text": "Was bewirkt der Mechanismus, bei dem zur Laufzeit entschieden wird, welche Methode ausgeführt wird (Dynamic Binding)?",
+    "typ": "multiple_choice",
+    "bild_pfad": null,
+    "erklaerung": "Dies ist die Polymorphie (Late Binding). Das Programm prüft zur Laufzeit den tatsächlichen Typ des Objekts und führt die dafür spezifische Implementierung der Methode aus, nicht die der Basisklasse.",
+    "antworten": [
+      {"text": "Statische Typisierung", "ist_korrekt": 0},
+      {"text": "Polymorphie (Dynamic Binding)", "ist_korrekt": 1},
+      {"text": "Kapselung", "ist_korrekt": 0},
+      {"text": "Datenabstraktion", "ist_korrekt": 0}
+    ]
+  },
+  {
+    "themengebiet_id": 4,
+    "frage_text": "Berechnen Sie den benötigten Speicherbedarf in TiB für Bilder innerhalb eines Jahres (52 Wochen) bei gegebener Frequenz.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Rechnung: Anzahl Bilder pro Tag * Größe pro Bild * Tage (365 oder 52*7) = Gesamtmenge in Byte. Dann Umrechnung: 1 TiB = 1024^4 Byte. (Hinweis: Achte darauf, ob das Ergebnis in TB (10^12) oder TiB (2^40) gefordert ist!).",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 4,
+    "frage_text": "Erstellen Sie eine SQL-Anweisung, um alle Daten der geschlachteten Tiere aus einer Tabelle in eine Archiv-Tabelle zu verschieben.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Zwei Schritte: 1. INSERT INTO Archiv_Tierbestand SELECT * FROM Tierbestand WHERE Status = 'geschlachtet'. 2. DELETE FROM Tierbestand WHERE Status = 'geschlachtet'.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 4,
+    "frage_text": "Beschreiben Sie zwei Gründe, warum neuronale Netze (insb. CNNs) für die Kennzeichen-Erkennung geeignet sind.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "1. Automatische Merkmalsextraktion: CNNs lernen selbstständig, wichtige Merkmale wie Kanten oder Buchstabenformen zu erkennen, statt diese manuell programmieren zu müssen. 2. Toleranz gegenüber Bildvariationen: Sie erkennen Kennzeichen auch bei unterschiedlicher Beleuchtung, leichten Winkeln oder Unschärfen sehr robust.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 4,
+    "frage_text": "Beschreiben Sie zwei Maßnahmen, um einen rechtskonformen Betrieb (Datenschutz) bei der Kennzeichen-Erfassung zu gewährleisten.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "1. Transparenz: Hinweisschilder am Werksgelände, die über den Zweck der Erfassung informieren. 2. Löschkonzept: Automatisierte Löschung der Daten, sobald die Berechtigung zur Einfahrt geprüft wurde (sofern kein berechtigter Zweck für längere Speicherung vorliegt).",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 4,
+    "frage_text": "Beschreiben Sie je zwei Vor- und Nachteile einer dezentralen Speicherung von Daten.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Vorteile: Höhere Ausfallsicherheit (kein Single Point of Failure), geringere Latenz bei lokalem Zugriff. Nachteile: Schwierige Konsistenzhaltung der Daten über alle Standorte, höherer Administrationsaufwand für Updates und Backups.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 4,
+    "frage_text": "Erstellen Sie eine SQL-Abfrage zur Auflistung aller Tier-Kategorien inklusive der Informationen über die lebenden Tiere.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "SELECT Kategorien.Name, COUNT(Tiere.ID) as Anzahl, AVG(Tiere.Gewicht) FROM Kategorien JOIN Tiere ON Kategorien.ID = Tiere.KategorieID WHERE Tiere.Status = 'lebend' GROUP BY Kategorien.Name;",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 3,
+    "frage_text": "Welche HTTP-Methode wird in REST-APIs verwendet, um eine bestehende Ressource komplett zu ersetzen?",
+    "typ": "multiple_choice",
+    "bild_pfad": null,
+    "erklaerung": "PUT wird verwendet, um eine Ressource unter der angegebenen URL komplett zu ersetzen oder neu anzulegen.",
+    "antworten": [
+      {"text": "GET", "ist_korrekt": 0},
+      {"text": "POST", "ist_korrekt": 0},
+      {"text": "PUT", "ist_korrekt": 1},
+      {"text": "DELETE", "ist_korrekt": 0}
+    ]
+  },
+  {
+    "themengebiet_id": 3,
+    "frage_text": "Was ist ein 'Kritischer Pfad' in einem Netzplan?",
+    "typ": "multiple_choice",
+    "bild_pfad": null,
+    "erklaerung": "Der kritische Pfad ist die längste Kette von Aktivitäten im Netzplan. Jede Verzögerung auf diesem Pfad führt direkt zu einer Verzögerung des gesamten Projektabschlusses.",
+    "antworten": [
+      {"text": "Die günstigste Route durch das Projekt", "ist_korrekt": 0},
+      {"text": "Die längste Kette von Vorgängen, bei denen kein Puffer vorhanden ist", "ist_korrekt": 1},
+      {"text": "Der Pfad mit den meisten Fehlern", "ist_korrekt": 0},
+      {"text": "Die Verbindung der Aufgaben mit dem größten Puffer", "ist_korrekt": 0}
+    ]
+  },
+  {
+    "themengebiet_id": 4,
+    "frage_text": "Was bedeutet ein RPO (Recovery Point Objective) von 2 Stunden?",
+    "typ": "multiple_choice",
+    "bild_pfad": null,
+    "erklaerung": "RPO beschreibt den maximal akzeptablen Datenverlust. Ein RPO von 2h bedeutet, dass im Ernstfall maximal Daten der letzten 2 Stunden verloren gehen dürfen.",
+    "antworten": [
+      {"text": "Die Wiederherstellung dauert 2 Stunden", "ist_korrekt": 0},
+      {"text": "Es dürfen maximal Daten der letzten 2 Stunden verloren gehen", "ist_korrekt": 1},
+      {"text": "Das System muss nach 2 Stunden wieder laufen", "ist_korrekt": 0},
+      {"text": "Backups werden alle 2 Stunden gelöscht", "ist_korrekt": 0}
+    ]
+  },
+
+
+
+  {
+    "themengebiet_id": 5,
+    "frage_text": "Beschreiben Sie den Unterschied zwischen einem 'Ereignis' und einer 'Funktion' in einer EPK.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Ereignis: Beschreibt einen Zustand, der eingetreten ist (passiv, z.B. 'Ware eingegangen'). Funktion: Beschreibt eine Tätigkeit oder Aufgabe, die ausgeführt wird (aktiv, z.B. 'Ware prüfen').",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 5,
+    "frage_text": "Warum muss bei der Prozessmodellierung darauf geachtet werden, dass nach einer XOR-Verknüpfung nicht mehrere Pfade gleichzeitig aktiv werden?",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "XOR (Exklusiv-Oder) bedeutet, dass immer nur genau eine Bedingung zutreffen darf. Wenn mehrere Pfade aktiv wären, würde das der Logik des exklusiven Pfades widersprechen und könnte zu Fehlern im Prozessablauf führen.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 5,
+    "frage_text": "Was versteht man unter 'Medienbruch' in einem Geschäftsprozess und wie kann er vermieden werden?",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Medienbruch ist der Wechsel zwischen digitalen und analogen Medien (z.B. Ausdrucken einer PDF zum Unterschreiben). Vermeidung durch: Digitale Signaturen (eIDAS), automatisierte Workflows oder Web-Formulare.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 5,
+    "frage_text": "Ein Prozess soll optimiert werden. Erläutern Sie die Methode 'Eliminieren'.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Eliminieren bedeutet, Arbeitsschritte zu identifizieren, die keinen direkten Mehrwert für das Produkt oder den Kunden erbringen (Verschwendung) und diese ersatzlos aus dem Prozess zu streichen.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 5,
+    "frage_text": "Erläutern Sie den Zweck einer 'Business Impact Analyse' (BIA) im Kontext von Geschäftsprozessen.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Die BIA identifiziert, welche Prozesse kritisch sind und welche Auswirkungen ein Ausfall dieser Prozesse auf das Unternehmen hätte (finanziell, rechtlich, Reputation). Sie dient als Basis für das Notfallmanagement.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 5,
+    "frage_text": "Welche Datenkategorie fällt gemäß DSGVO unter 'besondere Kategorien personenbezogener Daten'?",
+    "typ": "multiple_choice",
+    "bild_pfad": null,
+    "erklaerung": "Besondere Daten (Art. 9 DSGVO) sind z.B. Gesundheitsdaten, ethnische Herkunft, politische Meinungen oder religiöse Überzeugungen. Diese unterliegen einem strengeren Schutz.",
+    "antworten": [
+      {"text": "Anschrift und E-Mail-Adresse", "ist_korrekt": 0},
+      {"text": "IP-Adresse", "ist_korrekt": 0},
+      {"text": "Gesundheitsdaten", "ist_korrekt": 1},
+      {"text": "Bankverbindung", "ist_korrekt": 0}
+    ]
+  },
+  {
+    "themengebiet_id": 5,
+    "frage_text": "Was ist das Hauptziel von 'Data Mining' in Geschäftsprozessen?",
+    "typ": "multiple_choice",
+    "bild_pfad": null,
+    "erklaerung": "Data Mining zielt darauf ab, in großen Datenmengen verborgene Muster, Zusammenhänge oder Trends zu entdecken, die für strategische Entscheidungen genutzt werden können.",
+    "antworten": [
+      {"text": "Die manuelle Dateneingabe beschleunigen", "ist_korrekt": 0},
+      {"text": "Die Entdeckung von verborgenen Mustern und Zusammenhängen in Daten", "ist_korrekt": 1},
+      {"text": "Die Sicherung von Daten gegen Hackerangriffe", "ist_korrekt": 0},
+      {"text": "Die Verschlüsselung von E-Mail-Kommunikation", "ist_korrekt": 0}
+    ]
+  },
+
+
+
+  {
+    "themengebiet_id": 1,
+    "frage_text": "Bringen Sie die folgenden Schritte nach einem Arbeitsunfall in die richtige Reihenfolge.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "1. Erste Hilfe leisten / Unfallstelle absichern. 2. Notruf absetzen (falls nötig). 3. Vorgesetzten informieren. 4. Eintragung ins Verbandbuch. 5. Ggf. Meldung an die Berufsgenossenschaft durch den Arbeitgeber.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 1,
+    "frage_text": "Was ist der Hauptunterschied zwischen einer betrieblichen und einer gesellschaftlichen Arbeitsteilung?",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Betriebliche Arbeitsteilung: Ein betrieblicher Produktionsprozess wird in Teilaufgaben zerlegt (z.B. Programmierer vs. Tester). Gesellschaftliche Arbeitsteilung: Die gesamte Gesellschaft spezialisiert sich auf Berufe (z.B. Bäcker, Maurer, IT-Fachkraft).",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 1,
+    "frage_text": "Welche Aufgaben hat ein Arbeitsschutzbeauftragter im Betrieb?",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Beratung des Arbeitgebers bei Arbeitsschutz und Unfallverhütung, Überprüfung der Betriebsstätten auf Sicherheitsmängel, Unterstützung bei der Gefährdungsbeurteilung und Unterweisung der Mitarbeiter.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 1,
+    "frage_text": "Was beschreibt ein ökologisches Ziel in einem Unternehmen?",
+    "typ": "multiple_choice",
+    "bild_pfad": null,
+    "erklaerung": "Ökologische Ziele befassen sich mit dem Umweltschutz, z.B. Reduktion des CO2-Ausstoßes, sparsamer Energieverbrauch oder Abfallvermeidung.",
+    "antworten": [
+      {"text": "Maximierung des Gewinns", "ist_korrekt": 0},
+      {"text": "Reduzierung des Energieverbrauchs", "ist_korrekt": 1},
+      {"text": "Steigerung der Mitarbeiterzufriedenheit", "ist_korrekt": 0},
+      {"text": "Marktführerschaft bei IT-Dienstleistungen", "ist_korrekt": 0}
+    ]
+  },
+  {
+    "themengebiet_id": 1,
+    "frage_text": "Welche Aussage zum Umweltzeichen 'Blauer Engel' ist zutreffend?",
+    "typ": "multiple_choice",
+    "bild_pfad": null,
+    "erklaerung": "Der Blaue Engel ist ein staatliches Siegel für besonders umweltschonende Produkte und Dienstleistungen.",
+    "antworten": [
+      {"text": "Es ist ein privates Siegel für Luxusartikel", "ist_korrekt": 0},
+      {"text": "Es kennzeichnet besonders umweltschonende Produkte", "ist_korrekt": 1},
+      {"text": "Es ist ein Siegel für faire Bezahlung der Mitarbeiter", "ist_korrekt": 0},
+      {"text": "Es garantiert, dass ein Produkt nicht im Ausland produziert wurde", "ist_korrekt": 0}
+    ]
+  },
+  {
+    "themengebiet_id": 1,
+    "frage_text": "Welche Maßnahmen sind bei einem Brand im Betrieb sofort zu ergreifen?",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "1. Ruhe bewahren. 2. Notruf absetzen (112). 3. Gefahrenbereich verlassen (Brandabschnitt schließen). 4. Mitmenschen warnen. 5. Den Anweisungen des Brandschutzhelfers folgen und den Sammelplatz aufsuchen.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 1,
+    "frage_text": "Was sind typische Bestandteile eines durchschnittlichen Stundensatzes in einer Kalkulation?",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "1. Bruttolohnkosten. 2. Sozialversicherungsbeiträge (AG-Anteil). 3. Gemeinkosten (Miete, Strom, IT). 4. Gewinnzuschlag. 5. Wagnisaufschlag.",
+    "antworten": []
+  },
+
+
+
+  {
+    "themengebiet_id": 0,
+    "frage_text": "Welche FSMO-Rolle (Flexible Single Master Operations) ist innerhalb einer gesamten Active Directory Gesamtstruktur (Forest) einzigartig und darf nur ein einziges Mal existieren?",
+    "typ": "multiple_choice",
+    "bild_pfad": null,
+    "erklaerung": "Der Schema-Master und der Domänenbennennungs-Master existieren nur einmal pro Gesamtstruktur (Forest). Die Rollen RID-Master, PDC-Emulator und Infrastruktur-Master existieren hingegen einmal pro Domäne.",
+    "antworten": [
+      {"text": "RID-Master", "ist_korrekt": 0},
+      {"text": "PDC-Emulator", "ist_korrekt": 0},
+      {"text": "Schema-Master", "ist_korrekt": 1},
+      {"text": "Infrastruktur-Master", "ist_korrekt": 0}
+    ]
+  },
+  {
+    "themengebiet_id": 0,
+    "frage_text": "Erläutern Sie die standardmäßige Reihenfolge (Vererbung), in der Gruppenrichtlinienobjekte (GPOs) im Active Directory verarbeitet werden.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Die Verarbeitung folgt der sogenannten LSDOU-Regel: 1. Lokal (Local), 2. Standort (Site), 3. Domäne (Domain), 4. Organisationseinheit (OU). Hierbei überschreiben die Einstellungen der untergeordneten Ebenen (z. B. OU) standardmäßig die der übergeordneten Ebenen (z. B. Domäne), sofern keine Richtlinienerzwingung ('Enforced') konfiguriert ist.",
+    "antworten": []
+  },
+  {
+    "themengebiet_id": 0,
+    "frage_text": "Welches Netzwerkprotokoll und welcher Port werden standardmäßig primär für die Benutzerauthentifizierung innerhalb einer Active Directory-Domäne verwendet?",
+    "typ": "multiple_choice",
+    "bild_pfad": null,
+    "erklaerung": "Kerberos v5 ist das primäre Authentifizierungsprotokoll in modernen Windows-Domänen und kommuniziert über den Port 88 (TCP/UDP). LDAP nutzt Port 389 und dient der Verzeichnisabfrage.",
+    "antworten": [
+      {"text": "LDAP auf Port 389", "ist_korrekt": 0},
+      {"text": "Kerberos auf Port 88", "ist_korrekt": 1},
+      {"text": "SMB auf Port 445", "ist_korrekt": 0},
+      {"text": "NTLM auf Port 139", "ist_korrekt": 0}
+    ]
+  },
+  {
+    "themengebiet_id": 0,
+    "frage_text": "Beschreiben Sie die primäre Aufgabe des Globalen Katalogs (Global Catalog) in einer Active Directory-Umgebung mit mehreren Domänen.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Der Globale Katalog (GC) ist ein Domänencontroller, der eine schreibgeschützte Teilkopie aller Objekte aus allen Domänen der Gesamtstruktur speichert. Er ermöglicht Benutzern und Anwendungen eine schnelle, domänenübergreifende Suche nach Ressourcen (wie Benutzern, Gruppen oder Druckern), ohne dass direkte Abfragen an die spezifischen Herkunftsdomänen gesendet werden müssen.",
+    "antworten": []
+  },
+  
+    {
+    "themengebiet_id": 9,
+    "frage_text": "Welche SQL-Anweisung wird verwendet, um Daten aus einer Tabelle (einer Datenquelle) auszulesen?",
+    "typ": "multiple_choice",
+    "bild_pfad": null,
+    "erklaerung": "Mit SELECT werden Daten aus einer oder mehreren Tabellen einer Datenbank abgefragt (erfasst).",
+    "antworten": [
+        {"text": "SELECT", "ist_korrekt": 1, "reihenfolge": 1},
+        {"text": "INSERT", "ist_korrekt": 0, "reihenfolge": 2},
+        {"text": "UPDATE", "ist_korrekt": 0, "reihenfolge": 3},
+        {"text": "DELETE", "ist_korrekt": 0, "reihenfolge": 4}
+    ]
+    },
+    {
+    "themengebiet_id": 9,
+    "frage_text": "Nennen Sie drei typische Datenquellen, aus denen ein Unternehmen Daten erfassen kann.",
+    "typ": "freitext",
+    "bild_pfad": null,
+    "erklaerung": "Z. B.: relationale Datenbanken, CSV/Excel-Dateien, APIs/Webservices, Sensoren, Formulareingaben.",
+    "antworten": []
+    }
+]
