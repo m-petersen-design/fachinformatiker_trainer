@@ -1,13 +1,19 @@
-import 'dart:async';
-import 'dart:math' as math;
+import 'dart:async'; // Für Timer (Typewriter-Effekt)
+import 'dart:math' as math; // Für Trigonometrie bei den Netzwerk-Topologien
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; 
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart'; 
-import 'package:sqflite/sqflite.dart'; 
+import 'package:sqflite/sqflite.dart'; // Zugriff auf rawSQL und ConflictAlgorithms
 import '../../core/database/database_service.dart';
 import '../../core/audio_service.dart'; 
 
+// ==========================================
+// 1. VISUELLE WIDGETS & CUSTOM PAINTER
+// ==========================================
+
+/// **TypewriterText (Schreibmaschinen-Effekt)**
+/// Ein isoliertes StatefulWidget, das Strings Zeichen für Zeichen aufbaut.
 class TypewriterText extends StatefulWidget {
   final String text;
   final TextStyle style;
@@ -27,7 +33,12 @@ class _TypewriterTextState extends State<TypewriterText> {
     _type(); 
   }
 
-  // NEU: Setzt die Animation bei einer neuen Frage zurück.
+  /// **didUpdateWidget (Lifecycle-Methode)**
+  /// Ein extrem wichtiges Konzept! Wenn der Nutzer zur nächsten Frage klickt,
+  /// erstellt Flutter den QuizScreen nicht komplett neu (Ressourcen-Schonung),
+  /// sondern reicht dem bestehenden Widget nur den neuen Text rein.
+  /// Hier fangen wir diese Änderung ab, brechen den alten Timer ab, 
+  /// setzen den String zurück und starten den Effekt neu.
   @override
   void didUpdateWidget(TypewriterText oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -43,12 +54,14 @@ class _TypewriterTextState extends State<TypewriterText> {
 
   @override
   void dispose() { 
-    _timer?.cancel(); 
+    _timer?.cancel(); // Memory Leak Prevention: Timer beim Verlassen zerstören!
     super.dispose(); 
   }
 
   void _type() {
     _timer = Timer.periodic(const Duration(milliseconds: 30), (timer) {
+      // 'mounted' prüft, ob das Widget noch im UI-Baum existiert, 
+      // bevor setState aufgerufen wird (verhindert Abstürze beim schnellen Wegklicken).
       if (charIndex < widget.text.length && mounted) { 
         setState(() { displayedText += widget.text[charIndex]; charIndex++; }); 
       } else { 
@@ -61,9 +74,13 @@ class _TypewriterTextState extends State<TypewriterText> {
   Widget build(BuildContext context) => Text(displayedText + (charIndex < widget.text.length ? "_" : ""), style: widget.style);
 }
 
+/// **ScanlinePainter**
+/// Zeichnet subtile CRT-Scanlines über das gesamte UI (Retro-Terminal-Look).
+/// Sehr ressourcenschonend, da es nur simple Linien rendert und shouldRepaint auf false steht.
 class ScanlinePainter extends CustomPainter {
   final Color lineColor;
   ScanlinePainter(this.lineColor);
+  
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..color = lineColor.withValues(alpha: 0.15)..strokeWidth = 2.0; 
@@ -75,11 +92,15 @@ class ScanlinePainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
+/// **TopologyPainter (FISI-Spezial)**
+/// Berechnet und zeichnet dynamisch Netzwerk-Topologien (Stern, Ring, Mesh, Bus) 
+/// mit Hilfe von Trigonometrie (Sinus/Cosinus) auf den Canvas.
 class TopologyPainter extends CustomPainter {
   final String type;
   final Color primaryColor;
   final Color surfaceColor;
   TopologyPainter({required this.type, required this.primaryColor, required this.surfaceColor});
+  
   @override
   void paint(Canvas canvas, Size size) {
     final nodePaint = Paint()..color = surfaceColor..style = PaintingStyle.fill;
@@ -88,60 +109,48 @@ class TopologyPainter extends CustomPainter {
 
     final double cx = size.width / 2; final double cy = size.height / 2;
     final double radius = math.min(size.width, size.height) * 0.35;
+    
+    // 1. Berechne die Positionen der Rechner (Nodes) in einem perfekten Kreis
     int numNodes = 5; List<Offset> points = [];
     for (int i = 0; i < numNodes; i++) {
       double angle = (i * 2 * math.pi / numNodes) - math.pi / 2;
       points.add(Offset(cx + radius * math.cos(angle), cy + radius * math.sin(angle)));
     }
 
+    // 2. Verbinde die Nodes basierend auf der Topologie-Art
     if (type == 'topology_star') {
       final Offset center = Offset(cx, cy);
-      for (var point in points) {
-        canvas.drawLine(center, point, linePaint);
-      }
-      for (var point in points) { 
-        canvas.drawCircle(point, 12, nodePaint); 
-        canvas.drawCircle(point, 12, nodeBorderPaint); 
-      }
+      for (var point in points) canvas.drawLine(center, point, linePaint);
+      for (var point in points) { canvas.drawCircle(point, 12, nodePaint); canvas.drawCircle(point, 12, nodeBorderPaint); }
       canvas.drawCircle(center, 18, nodePaint); 
-      canvas.drawCircle(center, 18, nodeBorderPaint..color = Colors.amberAccent);
+      canvas.drawCircle(center, 18, nodeBorderPaint..color = Colors.amberAccent); // Switch/Hub in der Mitte
     } 
     else if (type == 'topology_ring') {
-      for (int i = 0; i < numNodes; i++) {
-        canvas.drawLine(points[i], points[(i + 1) % numNodes], linePaint);
-      }
-      for (var point in points) { 
-        canvas.drawCircle(point, 12, nodePaint); 
-        canvas.drawCircle(point, 12, nodeBorderPaint); 
-      }
+      for (int i = 0; i < numNodes; i++) canvas.drawLine(points[i], points[(i + 1) % numNodes], linePaint);
+      for (var point in points) { canvas.drawCircle(point, 12, nodePaint); canvas.drawCircle(point, 12, nodeBorderPaint); }
     } 
     else if (type == 'topology_bus') {
       final double ly = cy; 
-      canvas.drawLine(Offset(20, ly), Offset(size.width - 20, ly), linePaint..strokeWidth = 3.0);
+      canvas.drawLine(Offset(20, ly), Offset(size.width - 20, ly), linePaint..strokeWidth = 3.0); // Der Backbone-Bus
       double spacing = (size.width - 60) / (numNodes - 1);
       for (int i = 0; i < numNodes; i++) {
         double nx = 30 + (i * spacing); double ny = (i % 2 == 0) ? ly - 40 : ly + 40; Offset nodePos = Offset(nx, ny);
-        canvas.drawLine(Offset(nx, ly), nodePos, linePaint..strokeWidth = 1.5);
-        canvas.drawCircle(nodePos, 12, nodePaint); 
-        canvas.drawCircle(nodePos, 12, nodeBorderPaint);
+        canvas.drawLine(Offset(nx, ly), nodePos, linePaint..strokeWidth = 1.5); // Drop-Line
+        canvas.drawCircle(nodePos, 12, nodePaint); canvas.drawCircle(nodePos, 12, nodeBorderPaint);
       }
     }
     else if (type == 'topology_mesh') {
       for (int i = 0; i < points.length; i++) { 
-        for (int j = i + 1; j < points.length; j++) {
-          canvas.drawLine(points[i], points[j], linePaint); 
-        }
+        for (int j = i + 1; j < points.length; j++) canvas.drawLine(points[i], points[j], linePaint); 
       }
-      for (var point in points) { 
-        canvas.drawCircle(point, 12, nodePaint); 
-        canvas.drawCircle(point, 12, nodeBorderPaint); 
-      }
+      for (var point in points) { canvas.drawCircle(point, 12, nodePaint); canvas.drawCircle(point, 12, nodeBorderPaint); }
     }
   }
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
+// Physik-Modell für den Konfetti-Regen am Ende
 class Particle {
   double x, y, speed, size; Color color;
   Particle(this.x, this.y, this.speed, this.size, this.color);
@@ -157,23 +166,44 @@ class ParticlePainter extends CustomPainter {
     }
   }
   @override
-  bool shouldRepaint(covariant ParticlePainter oldDelegate) => true;
+  bool shouldRepaint(covariant ParticlePainter oldDelegate) => true; // Zwingt 60 FPS Render-Loop
 }
 
+
+// ==========================================
+// 2. HAUPTBILDSCHIRM (QuizScreen)
+// ==========================================
+
 class QuizScreen extends StatefulWidget {
-  final int themengebietId; final String themengebietName; final int? fachrichtungId; 
+  final int themengebietId; 
+  final String themengebietName; 
+  final int? fachrichtungId; 
   const QuizScreen({super.key, required this.themengebietId, required this.themengebietName, this.fachrichtungId});
+  
   @override
   State<QuizScreen> createState() => _QuizScreenState();
 }
 
 class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateMixin {
-  bool _isLoading = true; List<Map<String, dynamic>> _quizDaten = [];
-  int _aktuelleFrageIndex = 0; bool _quizBeendet = false; int _richtigeAntworten = 0; int _falscheAntworten = 0; int _aktuelleXP = 0;
-  bool _frageBeantwortet = false; int? _gewaehlteAntwortIndex; 
+  
+  // --- STATE-MANAGEMENT ---
+  bool _isLoading = true; 
+  List<Map<String, dynamic>> _quizDaten = []; // Hält die verschachtelten Fragen und Antworten
+  int _aktuelleFrageIndex = 0; 
+  bool _quizBeendet = false; 
+  int _richtigeAntworten = 0; 
+  int _falscheAntworten = 0; 
+  int _aktuelleXP = 0;
+  bool _frageBeantwortet = false; 
+  int? _gewaehlteAntwortIndex; 
   final _freitextController = TextEditingController();
-  int _aktuelleStreak = 0; bool _zeigeVader = false; String _vaderSpruch = ''; String _vaderGifPath = ''; 
-  bool _showErrorFlash = false;
+  
+  // --- GAMIFICATION ---
+  int _aktuelleStreak = 0; 
+  bool _zeigeVader = false; 
+  String _vaderSpruch = ''; 
+  String _vaderGifPath = ''; 
+  bool _showErrorFlash = false; // Roter Bildschirm-Blitz bei Fehlern
 
   final List<String> _vaderLobGifs = ['assets/vader_lob.gif', 'assets/vader_lob2.gif', 'assets/vader_lob3.gif'];
   final List<String> _vaderKritikGifs = ['assets/vader_kritik.gif', 'assets/vader_kritik2.gif', 'assets/vader_kritik3.gif'];
@@ -184,16 +214,23 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
   final List<Particle> _particles = [];
   final math.Random _random = math.Random();
 
+  // --- LIFECYCLE ---
   @override
   void initState() {
     super.initState();
+    // Konfiguriert den Particle-Loop für den Ergebnis-Bildschirm
     _particleController = AnimationController(vsync: this, duration: const Duration(seconds: 1))..addListener(_updateParticles);
     _ladeGemischtesQuiz();
   }
 
   @override
-  void dispose() { _freitextController.dispose(); _particleController.dispose(); super.dispose(); }
+  void dispose() { 
+    _freitextController.dispose(); 
+    _particleController.dispose(); // WICHTIG!
+    super.dispose(); 
+  }
 
+  // --- ANIMATIONS-LOGIK ---
   void _initParticles(Size size) {
     if (_particles.isNotEmpty) return;
     for (int i = 0; i < 50; i++) {
@@ -203,39 +240,12 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
 
   void _updateParticles() {
     for (var p in _particles) {
-      p.y -= p.speed;
-      if (p.y < -10) { 
+      p.y -= p.speed; // Physik-Update
+      if (p.y < -10) {  // Wenn oben raus, setze nach unten zurück
         p.y = MediaQuery.of(context).size.height + 10; 
         p.x = _random.nextDouble() * MediaQuery.of(context).size.width; 
       }
     }
-  }
-
-  Future<void> _ladeGemischtesQuiz() async {
-    final db = await DatabaseService.instance.database;
-    try { await db.execute("ALTER TABLE frage ADD COLUMN is_favorite INTEGER DEFAULT 0"); } catch (_) {}
-
-    List<Map<String, dynamic>> rawFragen = [];
-    if (widget.themengebietId == -1 && widget.fachrichtungId != null) {
-      final String jetzt = DateTime.now().toIso8601String();
-      rawFragen = await db.rawQuery('SELECT f.* FROM frage f JOIN user_fortschritt uf ON f.id = uf.frage_id JOIN themengebiet t ON f.themengebiet_id = t.id WHERE t.fachrichtung_id = ? AND uf.naechste_faelligkeit <= ?', [widget.fachrichtungId, jetzt]);
-    } else {
-      rawFragen = await db.query('frage', where: 'themengebiet_id = ?', whereArgs: [widget.themengebietId]);
-    }
-    List<Map<String, dynamic>> spielbareFragen = rawFragen.map((e) => Map<String, dynamic>.from(e)).toList();
-    spielbareFragen.shuffle(); 
-    List<Map<String, dynamic>> komplettesQuiz = [];
-    for (var frage in spielbareFragen) {
-      if (frage['typ'] == 'freitext') { 
-        komplettesQuiz.add({'frage': frage, 'antworten': <Map<String, dynamic>>[]}); 
-        continue; 
-      }
-      final rawAntworten = await db.query('antwort_option', where: 'frage_id = ?', whereArgs: [frage['id']]);
-      List<Map<String, dynamic>> gemischteAntworten = rawAntworten.map((e) => Map<String, dynamic>.from(e)).toList();
-      gemischteAntworten.shuffle(); 
-      komplettesQuiz.add({'frage': frage, 'antworten': gemischteAntworten});
-    }
-    setState(() { _quizDaten = komplettesQuiz; _isLoading = false; });
   }
 
   void _triggerErrorFlash() {
@@ -247,15 +257,62 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
     });
   }
 
+  // --- GESCHÄFTSLOGIK: DATEN LADE-ZYKLUS ---
+  
+  /// **Der Spaced-Repetition-Abruf**
+  Future<void> _ladeGemischtesQuiz() async {
+    final db = await DatabaseService.instance.database;
+    
+    // Fail-Safe: Falls die Spalte noch nicht existiert (Abwärtskompatibilität v11 auf v12)
+    try { await db.execute("ALTER TABLE frage ADD COLUMN is_favorite INTEGER DEFAULT 0"); } catch (_) {}
+
+    List<Map<String, dynamic>> rawFragen = [];
+    
+    // LOGIK-ZWEIG A: Spaced Repetition Algorithmus aktiv (Über den "Spielen"-Button vom Dashboard)
+    if (widget.themengebietId == -1 && widget.fachrichtungId != null) {
+      final String jetzt = DateTime.now().toIso8601String();
+      // SQL-JOIN: Lade nur die Fragen einer Fachrichtung, bei denen die 'naechste_faelligkeit' in der Vergangenheit liegt.
+      rawFragen = await db.rawQuery(
+        'SELECT f.* FROM frage f JOIN user_fortschritt uf ON f.id = uf.frage_id JOIN themengebiet t ON f.themengebiet_id = t.id WHERE t.fachrichtung_id = ? AND uf.naechste_faelligkeit <= ?', 
+        [widget.fachrichtungId, jetzt]
+      );
+    } 
+    // LOGIK-ZWEIG B: Klassischer Themen-Modus
+    else {
+      rawFragen = await db.query('frage', where: 'themengebiet_id = ?', whereArgs: [widget.themengebietId]);
+    }
+    
+    // Arrays in Dart sind als Referenz gebunden. Wir müssen sie 'klonen' (.from), um sie mischen zu können.
+    List<Map<String, dynamic>> spielbareFragen = rawFragen.map((e) => Map<String, dynamic>.from(e)).toList();
+    spielbareFragen.shuffle(); // Mischt die Reihenfolge der Fragen
+    
+    List<Map<String, dynamic>> komplettesQuiz = [];
+    
+    // Hole für jede gefundene Frage asynchron die dazugehörigen Antworten
+    for (var frage in spielbareFragen) {
+      if (frage['typ'] == 'freitext') { 
+        komplettesQuiz.add({'frage': frage, 'antworten': <Map<String, dynamic>>[]}); 
+        continue; 
+      }
+      final rawAntworten = await db.query('antwort_option', where: 'frage_id = ?', whereArgs: [frage['id']]);
+      List<Map<String, dynamic>> gemischteAntworten = rawAntworten.map((e) => Map<String, dynamic>.from(e)).toList();
+      gemischteAntworten.shuffle(); // Mischt A,B,C,D durch, damit die richtige Antwort wandert!
+      komplettesQuiz.add({'frage': frage, 'antworten': gemischteAntworten});
+    }
+    setState(() { _quizDaten = komplettesQuiz; _isLoading = false; });
+  }
+
+  // --- GESCHÄFTSLOGIK: SPIEL-MECHANIKEN ---
+
   void _pruefeAvatarEinsatz(bool warRichtig) {
     if (warRichtig) {
       _aktuelleStreak++;
       if (_aktuelleStreak > 0 && _aktuelleStreak % 3 == 0) {
-        _triggerVaderOverlay(true);
+        _triggerVaderOverlay(true); // Alle 3 richtigen Antworten gibt es ein Lob
       }
     } else { 
       _aktuelleStreak = 0; 
-      _triggerVaderOverlay(false); 
+      _triggerVaderOverlay(false); // Bei Fehler direkt Kritik
       _triggerErrorFlash(); 
     }
   }
@@ -275,22 +332,38 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
     await prefs.setInt('questFragen', current + 1);
   }
 
+  /// **Herzstück: Der Leitner-Algorithmus (Spaced Repetition)**
   Future<void> _frageFortschrittSpeichern(int frageId, bool warRichtig) async {
     final db = await DatabaseService.instance.database;
     final String jetzt = DateTime.now().toIso8601String();
     final List<Map<String, dynamic>> result = await db.query('user_fortschritt', where: 'frage_id = ?', whereArgs: [frageId]);
+    
     int altesIntervall = 0, versuche = 0;
     if (result.isNotEmpty) { 
       altesIntervall = result.first['intervall_tage'] as int; 
       versuche = result.first['anzahl_versuche'] as int; 
     }
+    
+    // ALGORYTHMUS: Wenn richtig, verdoppelt sich das Intervall (1 -> 2 -> 4 -> 8 Tage).
+    // Wenn falsch, fällt das Intervall radikal auf 0 zurück (Muss morgen wieder geübt werden).
     int neuesIntervall = warRichtig ? (altesIntervall == 0 ? 1 : altesIntervall * 2) : 0;
     final naechsteFaelligkeit = DateTime.now().add(Duration(days: neuesIntervall)).toIso8601String();
-    await db.insert('user_fortschritt', { 'frage_id': frageId, 'korrekt_beantwortet': warRichtig ? 1 : 0, 'anzahl_versuche': versuche + 1, 'letzter_versuch': jetzt, 'naechste_faelligkeit': naechsteFaelligkeit, 'intervall_tage': neuesIntervall, }, conflictAlgorithm: ConflictAlgorithm.replace);
+    
+    // ConflictAlgorithm.replace sorgt dafür, dass SQLite einen bestehenden Datensatz 
+    // überschreibt anstatt wegen doppelten Primary-Keys abzustürzen (UPSERT-Logik).
+    await db.insert('user_fortschritt', { 
+      'frage_id': frageId, 
+      'korrekt_beantwortet': warRichtig ? 1 : 0, 
+      'anzahl_versuche': versuche + 1, 
+      'letzter_versuch': jetzt, 
+      'naechste_faelligkeit': naechsteFaelligkeit, 
+      'intervall_tage': neuesIntervall, 
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
+  /// **Wertet Multiple-Choice-Fragen aus**
   void _mcAntwortAuswerten(int index, dynamic istKorrektRaw) {
-    if (_frageBeantwortet) return; 
+    if (_frageBeantwortet) return; // Verhindert Spam-Klicks
     HapticFeedback.selectionClick(); 
     AudioService.instance.playClick(); 
     
@@ -298,6 +371,7 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
       _gewaehlteAntwortIndex = index; _frageBeantwortet = true;
       int istKorrekt = (istKorrektRaw is int) ? istKorrektRaw : int.tryParse(istKorrektRaw.toString()) ?? 0;
       bool warRichtig = (istKorrekt == 1);
+      
       if (warRichtig) { 
         _richtigeAntworten++; _aktuelleXP += 10; HapticFeedback.mediumImpact(); 
         AudioService.instance.playSuccess();
@@ -306,10 +380,12 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
       }
       _pruefeAvatarEinsatz(warRichtig);
     });
+    
     final frageId = _quizDaten[_aktuelleFrageIndex]['frage']['id'] as int;
     _frageFortschrittSpeichern(frageId, _gewaehlteAntwortIndex != null && istKorrektRaw.toString() == "1");
   }
 
+  /// **Wertet Freitext-Fragen aus (Selbsteinschätzung)**
   void _freitextSelbstbewertung(bool warRichtig) {
     setState(() { 
       if (warRichtig) { 
@@ -327,6 +403,8 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
   Future<void> _xpInDatenbankSpeichern() async {
     if (_aktuelleXP > 0) {
       final db = await DatabaseService.instance.database;
+      // Tricky SQL: Wir wissen nur, in welchem Thema wir sind. 
+      // Wir müssen via Sub-Select erst die übergeordnete Fachrichtung herausfinden, um ihr die XP gutzuschreiben.
       if (widget.themengebietId == -1 && widget.fachrichtungId != null) {
         await db.rawUpdate('UPDATE fachrichtung SET xp = xp + ? WHERE id = ?', [_aktuelleXP, widget.fachrichtungId]);
       } else {
@@ -344,14 +422,17 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
       HapticFeedback.vibrate(); 
       AudioService.instance.playSuccess(); 
       setState(() => _quizBeendet = true);
-      _xpInDatenbankSpeichern(); _particleController.repeat(); 
+      _xpInDatenbankSpeichern(); 
+      _particleController.repeat(); // Startet den Konfetti-Regen
     }
   }
 
+  // --- UI RENDER METHODEN ---
+
   Widget _buildQuestionImageOrVector(String? path) {
-    if (path == null || path.trim().isEmpty) {
-      return const SizedBox.shrink();
-    }
+    if (path == null || path.trim().isEmpty) return const SizedBox.shrink();
+    
+    // Entscheidet dynamisch, ob eine Topology gezeichnet oder ein JPG/PNG geladen wird
     if (path.startsWith('topology_')) {
       return Container(
         height: 180, margin: const EdgeInsets.only(bottom: 20),
@@ -409,6 +490,8 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     if (_isLoading) return Scaffold(appBar: AppBar(title: Text(widget.themengebietName)), body: const Center(child: CircularProgressIndicator()));
     if (_quizDaten.isEmpty) return Scaffold(appBar: AppBar(title: Text(widget.themengebietName)), body: Center(child: Text('Keine Fragen vorhanden.', style: TextStyle(fontSize: 18, color: Theme.of(context).colorScheme.onSurface))));
+    
+    // Router-Logik: Wenn Array komplett durchlaufen wurde, zeige direkt den Erfolg-Screen.
     if (_quizBeendet) return _buildErgebnisScreen();
 
     final aktuelleDaten = _quizDaten[_aktuelleFrageIndex];
@@ -422,6 +505,7 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
         title: Text(widget.themengebietName, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)), 
         backgroundColor: Colors.transparent, elevation: 0,
         actions: [
+          // Bookmark-System (Holocron Archiv)
           IconButton(
             icon: Icon(
               (frage['is_favorite'] == 1) ? Icons.bookmark : Icons.bookmark_border, 
@@ -434,7 +518,7 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
               final db = await DatabaseService.instance.database;
               await db.rawUpdate('UPDATE frage SET is_favorite = ? WHERE id = ?', [newVal, frage['id']]);
               if (!mounted) return;
-              setState(() { frage['is_favorite'] = newVal; });
+              setState(() { frage['is_favorite'] = newVal; }); // UI Update
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(newVal == 1 ? 'Im Holocron Archiv gespeichert!' : 'Aus Archiv entfernt.')));
             },
           )
@@ -450,6 +534,8 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  
+                  // Score-HUD
                   Container(
                     margin: const EdgeInsets.only(bottom: 20), padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                     decoration: BoxDecoration(color: Theme.of(context).cardColor, borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4, offset: const Offset(0, 2))]),
@@ -470,6 +556,7 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
                   _buildTerminalQuestion(frage['frage_text'].toString(), frage['bild_pfad']?.toString()),
                   const SizedBox(height: 30),
 
+                  // TYPE: Multiple Choice Renderer
                   if (frage['typ'] == 'multiple_choice') ...[
                     ...antworten.asMap().entries.map((entry) {
                       int index = entry.key; var antwort = entry.value;
@@ -477,6 +564,7 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
                       Color buttonColor = Theme.of(context).cardColor; Color textColor = Theme.of(context).colorScheme.onSurface;
                       BorderSide border = BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1), width: 1);
 
+                      // Wenn beantwortet, färbe die Buttons ein
                       if (_frageBeantwortet) {
                         if (istKorrekt == 1) { buttonColor = Colors.green.withValues(alpha: 0.2); textColor = Colors.green; border = const BorderSide(color: Colors.green, width: 2); } 
                         else if (_gewaehlteAntwortIndex == index) { buttonColor = Colors.red.withValues(alpha: 0.2); textColor = Colors.red; border = const BorderSide(color: Colors.red, width: 2); }
@@ -493,6 +581,7 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
                     }),
                     if (_frageBeantwortet) ...[
                       const SizedBox(height: 20),
+                      // Zeige Musterlösung, falls vorhanden
                       if (frage['erklaerung'] != null && frage['erklaerung'].toString().isNotEmpty)
                         Container(
                           padding: const EdgeInsets.all(16),
@@ -509,6 +598,7 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
                       const SizedBox(height: 20),
                       ElevatedButton(style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)), onPressed: _naechsteFrage, child: const Text('Nächste Frage ➔', style: TextStyle(fontSize: 18)))
                     ]
+                  // TYPE: Freitext Renderer
                   ] else ...[
                     TextField(controller: _freitextController, maxLines: 5, enabled: !_frageBeantwortet, style: TextStyle(color: Theme.of(context).colorScheme.onSurface), decoration: const InputDecoration(labelText: 'Deine Antwort', border: OutlineInputBorder())),
                     const SizedBox(height: 20),
@@ -527,6 +617,7 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
             ),
           ),
           
+          // Flash-Layer für falsche Antworten
           IgnorePointer(
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
@@ -534,6 +625,7 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
             ),
           ),
 
+          // Vader Overlay Layer
           AnimatedPositioned(
             duration: const Duration(milliseconds: 600), curve: Curves.elasticOut,
             bottom: _zeigeVader ? 20 : -300, left: 20, right: 20,
@@ -560,6 +652,7 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
     );
   }
 
+  // --- RESULT SCREEN ---
   Widget _buildErgebnisScreen() {
     _initParticles(MediaQuery.of(context).size);
     return Scaffold(
@@ -590,7 +683,7 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
                         _richtigeAntworten = 0; _falscheAntworten = 0; _aktuelleXP = 0;
                         _frageBeantwortet = false; _gewaehlteAntwortIndex = null; _freitextController.clear(); _aktuelleStreak = 0; 
                       });
-                      _ladeGemischtesQuiz();
+                      _ladeGemischtesQuiz(); // Zieht neue Fragen und generiert die Ansicht neu
                     },
                   ),
                   const SizedBox(height: 16),
@@ -598,7 +691,7 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
                     onPressed: () { 
                       _particleController.stop(); 
                       AudioService.instance.playClick();
-                      Navigator.pop(context); 
+                      Navigator.pop(context); // Zurück zum Dashboard/Themen-Screen
                     }, 
                     child: Text('Zurück zum Menü', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)))
                   )

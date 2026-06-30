@@ -1,38 +1,88 @@
+# ==========================================
+# 1. METADATEN DES PROJEKTS
+# ==========================================
 name: fachinformatiker_trainer
 description: "A new Flutter project."
 
+# Sicherheitsnetz: Verhindert, dass das Projekt versehentlich auf pub.dev 
+# (dem globalen Dart-Paket-Register) veröffentlicht wird. Wichtig für proprietäre 
+# Schul- und Firmenprojekte, um Quellcode-Leaks zu vermeiden.
 publish_to: 'none' 
 
+# Semantic Versioning (SemVer)
+# Format: MAJOR.MINOR.PATCH+BUILD
+# 1.0.0 ist die Versionsnummer, das +1 ist die interne Build-Nummer für den Compiler 
+# (wichtig, falls ihr später über CI/CD-Pipelines automatisiert neue Versionen baut).
 version: 1.0.0+1
 
+# ==========================================
+# 2. UMGEBUNG (ENVIRONMENT)
+# ==========================================
+# Definiert die minimale Dart-SDK-Version.
+# Das Caret (^) bedeutet: "Kompatibel mit allen 3.x.x Versionen bis zur nächsten Major-Version 4.0.0".
 environment:
   sdk: ^3.12.2
 
+# ==========================================
+# 3. PRODUKTIV-ABHÄNGIGKEITEN (DEPENDENCIES)
+# Diese Pakete werden final in die fertige .exe oder .apk Datei einkompiliert.
+# ==========================================
 dependencies:
+  # Das Kern-Framework
   flutter:
     sdk: flutter
 
+  # --- State Management & Architektur ---
+  # Riverpod ist unsere Lösung für Dependency Injection und reaktives State Management.
+  # Es trennt die UI strikt von der Geschäftslogik.
   flutter_riverpod: ^2.5.1
+  
+  # --- Datenhaltung (Persistenz-Schicht) ---
+  # Die nativen SQLite-Bibliotheken
   sqflite: ^2.4.1
+  # Der FFI-Treiber (Foreign Function Interface) zwingend nötig für Desktop-Support (Windows/Linux)
   sqflite_common_ffi: ^2.3.3
+  # Hilft beim sicheren, plattformunabhängigen Zusammenbauen von Dateipfaden (z.B. C:\ vs /usr/bin)
   path: ^1.9.0
+  # Lightweight Key-Value-Store für Nutzerpräferenzen (Sith/Jedi-Theme)
+  shared_preferences: ^2.5.5
+  
+  # --- UI & Formatierung (Präsentations-Schicht) ---
+  # Für sauberes Datumsformat (z.B. für Spaced-Repetition-Berechnungen)
   intl: ^0.20.2
   cupertino_icons: ^1.0.8
-  file_selector: ^1.1.0
   google_fonts: ^8.1.0
+  # Erlaubt das Zeichnen von komplexen Graphen (z.B. für das XP- und Fortschritts-Dashboard)
   fl_chart: ^1.2.0
-  shared_preferences: ^2.5.5
+  
+  # --- Native System-Schnittstellen ---
+  # Erlaubt das Öffnen von nativen Datei-Dialogen (falls der Admin z.B. eigene JSONs importieren will)
+  file_selector: ^1.1.0
+  # Unsere Multi-Channel-Audio-Engine für asynchrone Soundeffekte
   audioplayers: ^6.8.0
 
+# ==========================================
+# 4. ENTWICKLER-ABHÄNGIGKEITEN (DEV_DEPENDENCIES)
+# Pakete, die NUR zur Entwicklungszeit gebraucht werden.
+# Sie landen NICHT in der finalen Release-App, was die Dateigröße drastisch reduziert.
+# ==========================================
 dev_dependencies:
+  # Ermöglicht das Schreiben von automatisierten Unit- und Widget-Tests
   flutter_test:
     sdk: flutter
+  # Der strenge Dart-Linter. Er erzwingt Clean Code und warnt vor Architekturfehlern.
   flutter_lints: ^6.0.0
 
+# ==========================================
+# 5. FLUTTER-SPEZIFISCHE KONFIGURATION
+# ==========================================
 flutter:
   uses-material-design: true
   
-  # Hier sind deine Bilder-Ordner korrekt angemeldet
+  # --- ASSET BUNDLING ---
+  # Hier registrieren wir statische Dateien. 
+  # Durch den Trailing-Slash (/) am Ende wird der GESAMTE Ordner registriert.
+  # Der Compiler packt diese Dateien zur Laufzeit in ein geschütztes AssetBundle.
   assets:
-    - assets/
-    - assets/sounds/
+    - assets/          # Enthält z.B. die basis_fragen.json
+    - assets/sounds/   # Enthält die MP3s für den AudioService

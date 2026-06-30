@@ -1,20 +1,29 @@
 import 'dart:ui';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; 
+import 'package:flutter/services.dart'; // Für das HapticFeedback (Vibration)
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../main.dart'; 
 import '../../core/database/database_service.dart';
-import '../../core/audio_service.dart'; // NEU: Audio Import
+import '../../core/audio_service.dart'; // Unser Singleton für Sound-Routen
 import '../../models/fachrichtung.dart';
 import '../themen/themen_screen.dart';
 import '../admin/admin_dashboard_screen.dart';
 import '../profile/profile_screen.dart';
-import '../extras/lern_tools.dart'; 
+import '../extras/lern_tools.dart';
 
+// ==========================================
+// 1. CUSTOM UI KOMPONENTEN (Wiederverwendbarkeit & Performance)
+// ==========================================
+
+/// **CustomPainter: StarfieldPainter**
+/// Ein tiefgreifendes Architektur-Feature. Anstatt 150 einzelne Flutter-Widgets 
+/// (wie Container) für die Sterne zu bauen, was den Arbeitsspeicher sprengen würde, 
+/// zeichnen wir hier direkt auf den rohen Canvas (Leinwand) der Grafikkarte (Skia/Impeller).
+/// Das garantiert flüssige 60 FPS selbst auf schwachen Endgeräten.
 class StarfieldPainter extends CustomPainter {
   final double animationValue;
-  final math.Random random = math.Random(42); 
+  final math.Random random = math.Random(42); // Fester Seed (42), damit das Sternenbild pro Frame nicht wild flackert
   final Color starColor;
 
   StarfieldPainter(this.animationValue, this.starColor);
@@ -27,14 +36,20 @@ class StarfieldPainter extends CustomPainter {
       double yOffset = random.nextDouble() * size.height;
       double speed = random.nextDouble() * 2 + 0.5; 
       double sizeDot = random.nextDouble() * 2;
+      // Parallax-Logik: Sterne fliegen basierend auf dem animationValue stufenlos nach unten.
       double y = (yOffset + (animationValue * 1000 * speed)) % size.height;
       canvas.drawCircle(Offset(x, y), sizeDot, paint..color = starColor.withValues(alpha: speed / 3));
     }
   }
+  
+  // Sagt der Render-Engine: "Zeichne das Bild nur neu, wenn der Taktgeber weitergetickt hat."
   @override
   bool shouldRepaint(covariant StarfieldPainter oldDelegate) => oldDelegate.animationValue != animationValue;
 }
 
+/// **Implizite Animation: HyperspaceLoader**
+/// Ein Ladekreis, der weich ins Bild poppt. Nutzt den TweenAnimationBuilder, 
+/// was uns das manuelle Managen eines AnimationControllers erspart.
 class HyperspaceLoader extends StatelessWidget {
   const HyperspaceLoader({super.key});
   @override
@@ -43,7 +58,7 @@ class HyperspaceLoader extends StatelessWidget {
       child: TweenAnimationBuilder<double>(
         tween: Tween(begin: 0.5, end: 2.0),
         duration: const Duration(milliseconds: 800),
-        curve: Curves.easeInOutBack,
+        curve: Curves.easeInOutBack, // Gibt dem Loader einen leichten "Overshoot"-Feder-Effekt
         builder: (context, val, child) => Transform.scale(
           scale: val,
           child: Icon(Icons.blur_on, color: Theme.of(context).colorScheme.primary.withValues(alpha: 1.0 - (val / 2)), size: 60),
@@ -53,14 +68,20 @@ class HyperspaceLoader extends StatelessWidget {
   }
 }
 
+/// **Wiederverwendbares Wrapper-Widget: BounceCard**
+/// Ein perfektes Beispiel für das DRY-Prinzip (Don't Repeat Yourself).
+/// Diese Karte kapselt die gesamte Animations-Logik (Klick-Feedback). 
+/// Wir können nun jedes beliebige UI-Element in eine 'BounceCard' hüllen, 
+/// um ihm sofort Physik, Sound und Haptik zu verleihen.
 class BounceCard extends StatefulWidget {
-  final Widget child;
-  final VoidCallback onTap;
+  final Widget child; // Das Widget, das animiert werden soll
+  final VoidCallback onTap; // Die Funktion, die beim Klick ausgeführt wird
   const BounceCard({super.key, required this.child, required this.onTap});
   @override
   State<BounceCard> createState() => _BounceCardState();
 }
 
+// 'SingleTickerProviderStateMixin' verbindet dieses Widget mit der Refresh-Rate (60hz) des Bildschirms.
 class _BounceCardState extends State<BounceCard> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
@@ -68,35 +89,50 @@ class _BounceCardState extends State<BounceCard> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
+    // Steuert die Dauer des Eindrückens (100ms)
     _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 100));
     _scaleAnimation = Tween<double>(begin: 1.0, end: 0.96).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
+  
   @override
-  void dispose() { _controller.dispose(); super.dispose(); }
+  void dispose() { 
+    _controller.dispose(); // VERHINDERT MEMORY LEAKS!
+    super.dispose(); 
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: (_) => _controller.forward(),
+      onTapDown: (_) => _controller.forward(), // Karte eindrücken
       onTapUp: (_) { 
-        HapticFeedback.lightImpact(); 
-        AudioService.instance.playClick(); // NEU: Audio Klick
-        _controller.reverse(); 
-        widget.onTap(); 
+        HapticFeedback.lightImpact(); // Native Smartphone-Vibration
+        AudioService.instance.playClick(); // UI-Sound aus unserem Singleton
+        _controller.reverse(); // Karte loslassen
+        widget.onTap(); // Die eigentliche Funktion ausführen
       },
-      onTapCancel: () => _controller.reverse(),
+      onTapCancel: () => _controller.reverse(), // Falls der User abrutscht
       child: ScaleTransition(scale: _scaleAnimation, child: widget.child),
     );
   }
 }
 
+// ==========================================
+// 2. HAUPTBILDSCHIRM (DashboardScreen)
+// ==========================================
+
+/// **UI-Komponente: DashboardScreen**
+/// Dies ist der Hauptverteiler der App. Hier werden Nutzerdaten aggregiert, 
+/// Tägliche Quests getrackt und die Fachrichtungen angezeigt.
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
+// 'TickerProviderStateMixin', weil wir MEHRERE AnimationController nutzen (_pulseController & _starController)
 class _DashboardScreenState extends State<DashboardScreen> with TickerProviderStateMixin {
+  
+  // --- STATE VARIABLEN ---
   List<Fachrichtung> _fachrichtungen = [];
   bool _isLoading = true;
   int _globalXP = 0;
@@ -109,17 +145,22 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   int _questProgress = 0;
   final int _questGoal = 10;
 
+  // --- LIFECYCLE ---
   @override
   void initState() {
     super.initState();
+    // 1. Animationen starten
     _pulseController = AnimationController(vsync: this, duration: const Duration(milliseconds: 1500))..repeat(reverse: true);
     _starController = AnimationController(vsync: this, duration: const Duration(seconds: 10))..repeat();
+    
+    // 2. Daten laden
     _ladeDaten();
     _loadDailyQuests();
 
-    // NEU: Spiele den Startup-Sound!
+    // 3. Audio-Feedback beim Kaltstart
     AudioService.instance.playStartup();
 
+    // 4. Asynchrone Sequenz: Vader-Begrüßung einfliegen und wieder ausblenden
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) setState(() => _showVaderGreeting = true);
       Future.delayed(const Duration(seconds: 4), () {
@@ -130,16 +171,23 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
 
   @override
   void dispose() {
+    // KRITISCH FÜR DIE ARCHITEKTUR: 
+    // Werden diese Controller hier nicht gelöscht, laufen sie im Hintergrund (RAM) 
+    // ewig weiter, selbst wenn der User die App verlässt.
     _pulseController.dispose();
     _starController.dispose();
     super.dispose();
   }
 
+  // --- GESCHÄFTSLOGIK ---
+
+  /// **Tägliche Quests auslesen & zurücksetzen (Local Storage)**
   Future<void> _loadDailyQuests() async {
     final prefs = await SharedPreferences.getInstance();
-    String today = DateTime.now().toIso8601String().substring(0, 10);
+    String today = DateTime.now().toIso8601String().substring(0, 10); // Format: YYYY-MM-DD
     String savedDate = prefs.getString('questDate') ?? '';
     
+    // Streak-Logik: Wenn der gespeicherte Tag nicht heute ist, wird die Quest genullt.
     if (savedDate != today) {
       await prefs.setString('questDate', today);
       await prefs.setInt('questFragen', 0);
@@ -147,6 +195,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     setState(() { _questProgress = prefs.getInt('questFragen') ?? 0; });
   }
 
+  /// **Datenbank-Aggregation: Lese Nutzerfortschritt**
   Future<void> _ladeDaten() async {
     final db = await DatabaseService.instance.database;
     final List<Map<String, dynamic>> maps = await db.query('fachrichtung');
@@ -154,7 +203,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     
     final rawFachrichtungen = List.generate(maps.length, (i) {
       final xp = maps[i]['xp'] as int? ?? 0;
-      berechneteGesamtXp += xp; 
+      berechneteGesamtXp += xp; // Sammelt die XP aus allen Kategorien für den globalen Zähler
       return Fachrichtung(
         id: maps[i]['id'] as int, name: maps[i]['name'] as String, kuerzel: maps[i]['kuerzel'] as String, 
         beschreibung: maps[i]['beschreibung']?.toString() ?? '', farbeHex: maps[i]['farbe_hex']?.toString() ?? '#00E5FF', xp: xp,
@@ -165,20 +214,28 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     int streak = 0;
     if (userStats.isNotEmpty) streak = userStats.first['streak_tage'] as int;
 
+    // UI-Update anfordern
     setState(() {
-      _fachrichtungen = rawFachrichtungen; _globalXP = berechneteGesamtXp; 
-      _aktuellerTagStreak = streak; _isLoading = false;
+      _fachrichtungen = rawFachrichtungen; 
+      _globalXP = berechneteGesamtXp; 
+      _aktuellerTagStreak = streak; 
+      _isLoading = false;
     });
   }
 
+  /// **Theme Switcher**
   void _toggleTheme() async {
     HapticFeedback.selectionClick();
-    AudioService.instance.playStartup(); // Schönes Feedback beim Wechsel
+    AudioService.instance.playStartup(); 
     final prefs = await SharedPreferences.getInstance();
+    
+    // Greift auf unseren globalen ValueNotifier in der main.dart zu
     bool isCurrentlyJedi = themeNotifier.value == ThemeMode.light;
     themeNotifier.value = isCurrentlyJedi ? ThemeMode.dark : ThemeMode.light;
     await prefs.setBool('isJedi', !isCurrentlyJedi);
   }
+
+  // --- WIDGET BUILDER METHODEN (Modularisierung der UI) ---
 
   Widget _buildDailyQuestCard() {
     double progress = (_questProgress / _questGoal).clamp(0.0, 1.0);
@@ -237,6 +294,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         ),
         SizedBox(
           height: 140,
+          // Horizontales Scrolling für Module
           child: ListView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -252,6 +310,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   }
 
   Widget _buildToolCard(String title, IconData icon, Color color, VoidCallback onTap) {
+    // Hier nutzen wir unsere abstrakte BounceCard für die Animation
     return BounceCard(
       onTap: onTap,
       child: Container(
@@ -284,13 +343,16 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       onTap: () async {
         HapticFeedback.lightImpact();
         AudioService.instance.playClick();
+        // Push & Await: Wenn der User vom Profil zurückkehrt, laden wir sofort die Daten neu.
         await Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileScreen()));
-        _ladeDaten(); _loadDailyQuests();
+        _ladeDaten(); 
+        _loadDailyQuests();
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
+          // Schöner Glas-Effekt (Glassmorphism)
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
             child: Container(
@@ -328,6 +390,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   ),
                   Column(
                     children: [
+                      // Flammen-Pulsieren: Wird nur animiert, wenn der Streak > 0 ist.
                       ScaleTransition(
                         scale: _aktuellerTagStreak > 0 ? Tween<double>(begin: 1.0, end: 1.2).animate(_pulseController) : const AlwaysStoppedAnimation(1.0),
                         child: Icon(Icons.local_fire_department, color: Theme.of(context).colorScheme.primary, size: 36),
@@ -351,7 +414,8 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     return BounceCard(
       onTap: () async {
         await Navigator.push(context, MaterialPageRoute(builder: (context) => ThemenScreen(fachrichtung: fach)));
-        _ladeDaten(); _loadDailyQuests();
+        _ladeDaten(); 
+        _loadDailyQuests();
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
@@ -381,6 +445,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        // Hero-Animation: Verbindet dieses Widget beim Übergang nahtlos mit dem nächsten Screen
                         Hero(
                           tag: 'fach_banner_${fach.id}',
                           child: Material(
@@ -427,6 +492,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     );
   }
 
+  // --- HAUPT-UI RENDER TREE ---
   @override
   Widget build(BuildContext context) {
     bool isLight = Theme.of(context).brightness == Brightness.light;
@@ -441,7 +507,8 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               HapticFeedback.selectionClick();
               AudioService.instance.playClick();
               await Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminDashboardScreen()));
-              _ladeDaten(); _loadDailyQuests();
+              _ladeDaten(); 
+              _loadDailyQuests();
             }, 
             icon: Icon(Icons.settings, color: Theme.of(context).colorScheme.primary), tooltip: 'Creator Mode',
           ),
@@ -450,8 +517,14 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       ),
       body: Stack(
         children: [
+          // 1. Hintergrundfarbe
           Container(color: Theme.of(context).scaffoldBackgroundColor),
+          
+          // 2. Sternenfeld-Animation (CustomPainter)
+          // 'IgnorePointer' stellt sicher, dass Klicks durch das Sternenfeld hindurch an die Buttons gehen.
           Positioned.fill(child: IgnorePointer(child: AnimatedBuilder(animation: _starController, builder: (context, child) => CustomPaint(painter: StarfieldPainter(_starController.value, Theme.of(context).colorScheme.onSurface))))),
+          
+          // 3. Inhalt (Ladescreen ODER fertiges Dashboard)
           if (_isLoading)
             const HyperspaceLoader()
           else
@@ -465,13 +538,16 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   padding: const EdgeInsets.only(left: 20.0, top: 20.0, bottom: 10.0),
                   child: Text('Fachrichtungen', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), letterSpacing: 1.1)),
                 ),
+                // Spread-Operator (...): Fügt die dynamisch generierten Karten direkt in das ListView-Array ein.
                 ..._fachrichtungen.map((fach) => _buildSleekFachrichtungCard(fach)),
               ],
             ),
 
+          // 4. Overlay: Das Vader-Greeting
+          // AnimatedPositioned schiebt das Widget elegant von oben (-150px) ins Bild und wieder zurück.
           AnimatedPositioned(
             duration: const Duration(milliseconds: 600),
-            curve: Curves.elasticOut,
+            curve: Curves.elasticOut, // Macht die Bewegung "bouncy"
             top: _showVaderGreeting ? MediaQuery.of(context).padding.top + 10 : -150, 
             left: 20, right: 20,
             child: Material(

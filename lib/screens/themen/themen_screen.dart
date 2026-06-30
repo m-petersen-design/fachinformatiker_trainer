@@ -6,6 +6,14 @@ import '../../core/database/database_service.dart';
 import '../../models/fachrichtung.dart';
 import '../quiz/quiz_screen.dart';
 
+// ==========================================
+// 1. WIEDERVERWENDBARE UI-KOMPONENTEN (DRY-Prinzip)
+// ==========================================
+
+/// **TypewriterText**
+/// Isoliertes Widget für den Schreibmaschinen-Effekt im Terminal.
+/// Da es einen eigenen State und Timer hat, belastet es nicht den 
+/// Neulade-Zyklus (Rebuild) des gesamten Bildschirms.
 class TypewriterText extends StatefulWidget {
   final String text;
   final TextStyle style;
@@ -24,8 +32,12 @@ class _TypewriterTextState extends State<TypewriterText> {
     super.initState();
     _type();
   }
+  
   @override
-  void dispose() { _timer?.cancel(); super.dispose(); }
+  void dispose() { 
+    _timer?.cancel(); // Verhindert Memory Leaks, wenn das Terminal ausgeblendet wird
+    super.dispose(); 
+  }
 
   void _type() {
     _timer = Timer.periodic(const Duration(milliseconds: 30), (timer) {
@@ -41,6 +53,9 @@ class _TypewriterTextState extends State<TypewriterText> {
   Widget build(BuildContext context) => Text(displayedText + (charIndex < widget.text.length ? "_" : ""), style: widget.style);
 }
 
+/// **BounceCard (Animation Wrapper)**
+/// Ein generischer Wrapper für Listen-Elemente. Kapselt die Animation (ScaleTransition) 
+/// und das haptische Feedback. So bleibt der Haupt-Code sauber und übersichtlich.
 class BounceCard extends StatefulWidget {
   final Widget child;
   final VoidCallback onTap;
@@ -52,14 +67,17 @@ class BounceCard extends StatefulWidget {
 class _BounceCardState extends State<BounceCard> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
+  
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 100));
     _scaleAnimation = Tween<double>(begin: 1.0, end: 0.96).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
+  
   @override
   void dispose() { _controller.dispose(); super.dispose(); }
+  
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -71,17 +89,27 @@ class _BounceCardState extends State<BounceCard> with SingleTickerProviderStateM
   }
 }
 
+// ==========================================
+// 2. HAUPT-SCREEN (Themen-Übersicht)
+// ==========================================
+
+/// **UI-Komponente: ThemenScreen**
+/// Zeigt alle Unterkategorien (z.B. Netzwerke, Datenbanken) einer übergebenen 
+/// Fachrichtung (z.B. FISI) an. 
 class ThemenScreen extends StatefulWidget {
+  // Dependency Injection: Der Screen erfordert zwingend eine Fachrichtung, um zu funktionieren.
   final Fachrichtung fachrichtung;
   const ThemenScreen({super.key, required this.fachrichtung});
+  
   @override
   State<ThemenScreen> createState() => _ThemenScreenState();
 }
 
 class _ThemenScreenState extends State<ThemenScreen> {
+  // --- STATE VARIABLEN ---
   bool _isLoading = true;
   List<Map<String, dynamic>> _themen = [];
-  int _faelligeFragenCount = 0;
+  int _faelligeFragenCount = 0; // Hält die Anzahl der Fragen, die heute wiederholt werden müssen
 
   @override
   void initState() {
@@ -89,11 +117,19 @@ class _ThemenScreenState extends State<ThemenScreen> {
     _ladeDaten();
   }
 
+  // --- DATENBANK & LOGIK ---
+
+  /// **Zieht die Themengebiete und berechnet den Spaced-Repetition-Bedarf**
   Future<void> _ladeDaten() async {
     final db = await DatabaseService.instance.database;
     final String jetzt = DateTime.now().toIso8601String();
     
+    // 1. Lade alle Themengebiete, die zur übergebenen Fachrichtung gehören
     final themen = await db.query('themengebiet', where: 'fachrichtung_id = ?', whereArgs: [widget.fachrichtung.id]);
+    
+    // 2. Komplexe relationale Abfrage (SQL JOIN)
+    // Zählt alle Fragen über alle Themengebiete dieser Fachrichtung hinweg zusammen, 
+    // deren 'naechste_faelligkeit' in der Vergangenheit liegt.
     final countResult = await db.rawQuery('''
       SELECT COUNT(f.id) as count FROM frage f
       JOIN user_fortschritt uf ON f.id = uf.frage_id
@@ -109,11 +145,19 @@ class _ThemenScreenState extends State<ThemenScreen> {
     setState(() { _themen = themen; _faelligeFragenCount = count; _isLoading = false; });
   }
 
+  /// **Refresh-Methode**
+  /// Wird aufgerufen, wenn der Nutzer die Liste nach unten zieht (Pull-to-Refresh) 
+  /// oder vom Quiz zurückkehrt, um die fälligen Fragen neu zu berechnen.
   Future<void> _refresh() async {
     setState(() => _isLoading = true);
     await _ladeDaten();
   }
 
+  // --- WIDGET BUILDER ---
+
+  /// **Das System-Log Terminal (Gamification UI)**
+  /// Ein dynamisches Widget, das seinen Zustand (Farbe, Text) komplett 
+  /// an die Menge der fälligen Fragen anpasst.
   Widget _buildSystemLogTerminal() {
     bool hasWarnings = _faelligeFragenCount > 0;
     Color terminalColor = hasWarnings ? Colors.orangeAccent : Colors.green;
@@ -153,6 +197,8 @@ class _ThemenScreenState extends State<ThemenScreen> {
                 Text(status, style: GoogleFonts.firaCode(color: terminalColor, fontSize: 14, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 TypewriterText('> $message', style: GoogleFonts.firaCode(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8), fontSize: 13)),
+                
+                // RENDERING BEDINGUNG: Der "Reparieren"-Button erscheint nur, wenn Fragen fällig sind.
                 if (hasWarnings) ...[
                   const SizedBox(height: 20),
                   SizedBox(
@@ -168,7 +214,9 @@ class _ThemenScreenState extends State<ThemenScreen> {
                       label: Text('Re-Kalibrierung starten', style: GoogleFonts.firaCode(fontWeight: FontWeight.bold)),
                       onPressed: () async {
                         HapticFeedback.selectionClick();
+                        // Startet ein "gemischtes" Quiz (themengebietId = -1) für alle fälligen Fragen dieser Fachrichtung
                         await Navigator.push(context, MaterialPageRoute(builder: (context) => QuizScreen(themengebietId: -1, themengebietName: '🔥 Schwächen (${widget.fachrichtung.kuerzel})', fachrichtungId: widget.fachrichtung.id)));
+                        // Wenn der User aus dem Quiz zurückkommt, wird die Liste aktualisiert.
                         _refresh();
                       },
                     ),
@@ -182,8 +230,10 @@ class _ThemenScreenState extends State<ThemenScreen> {
     );
   }
 
+  // --- HAUPT UI RENDER TREE ---
   @override
   Widget build(BuildContext context) {
+    // Parst die Hex-Farbe dynamisch aus der Datenbank für konsistentes Branding
     Color accentColor = Color(int.parse(widget.fachrichtung.farbeHex.replaceAll('#', '0xFF')));
 
     return Scaffold(
@@ -192,6 +242,9 @@ class _ThemenScreenState extends State<ThemenScreen> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // --- HERO ANIMATION ---
+            // Verbindet das Kürzel-Badge (z.B. FISI) visuell mit dem vorherigen Dashboard-Screen.
+            // Flutter interpoliert Größe und Position automatisch für einen flüssigen Übergang.
             Hero(
               tag: 'fach_banner_${widget.fachrichtung.id}',
               child: Material(
@@ -208,6 +261,7 @@ class _ThemenScreenState extends State<ThemenScreen> {
           ],
         ),
         backgroundColor: Colors.transparent, elevation: 0, centerTitle: false,
+        // Sorgt dafür, dass die Schrift lesbar bleibt, wenn Text hinter die AppBar gescrollt wird
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.9), Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.0)]),
@@ -221,6 +275,7 @@ class _ThemenScreenState extends State<ThemenScreen> {
             child: ListView(
               padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 20, bottom: 40, left: 16, right: 16),
               children: [
+                
                 _buildSystemLogTerminal(),
                 
                 Padding(
@@ -228,11 +283,13 @@ class _ThemenScreenState extends State<ThemenScreen> {
                   child: Text('Lern-Module', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), letterSpacing: 1.1)),
                 ),
 
+                // Fallback, falls der Admin eine Fachrichtung angelegt, aber noch keine Themen hinzugefügt hat
                 if (_themen.isEmpty)
                   Padding(padding: const EdgeInsets.all(20.0), child: Center(child: Text('Noch keine Module vorhanden.', style: TextStyle(fontSize: 15, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)))))
                 else
                   ..._themen.map((thema) => BounceCard(
                     onTap: () async {
+                      // Klassischer Modus: Startet ein Quiz spezifisch für ein Themengebiet (z.B. nur SQL)
                       await Navigator.push(context, MaterialPageRoute(builder: (context) => QuizScreen(themengebietId: thema['id'] as int, themengebietName: thema['name'].toString())));
                       _refresh();
                     },
@@ -241,6 +298,7 @@ class _ThemenScreenState extends State<ThemenScreen> {
                       decoration: BoxDecoration(color: Theme.of(context).cardColor, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 8, offset: const Offset(0, 4))]),
                       child: Stack(
                         children: [
+                          // Wasserzeichen-Effekt (Große, durchsichtige Buchstaben im Hintergrund der Kachel)
                           Positioned(
                             right: -20, bottom: -10,
                             child: Text(
