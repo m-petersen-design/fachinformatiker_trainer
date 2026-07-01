@@ -548,7 +548,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           AnimatedPositioned(
             duration: const Duration(milliseconds: 600),
             curve: Curves.elasticOut, // Macht die Bewegung "bouncy"
-            top: _showVaderGreeting ? MediaQuery.of(context).padding.top + 10 : -150, 
+            top: _showVaderGreeting ? MediaQuery.of(context).padding.top + 10 : -156, 
             left: 20, right: 20,
             child: Material(
               color: Colors.transparent,
