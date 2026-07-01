@@ -1,0 +1,29 @@
+name: Flutter CI-Pipeline # Name erscheint im Actions-Tab auf GitHub
+
+on: # Name erscheint im Actions-Tab auf GitHub
+  push:
+    branches: [main] # Nur bei direktem Push auf main
+  pull_request:
+    branches: [main] # Bei Pull-Requests aus einer Branch auf main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repository klonen
+        uses: actions/checkout@v4
+
+      - name: Flutter einrichten
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: SQLite-Bibliothek installieren
+        run: sudo apt-get install -y libsqlite3-dev
+
+      - name: Abhaengigkeiten installieren
+        run: flutter pub get
+
+      - name: Tests ausfuehren
+        run: flutter test --reporter=github
