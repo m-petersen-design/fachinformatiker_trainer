@@ -365,7 +365,6 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
   void _mcAntwortAuswerten(int index, dynamic istKorrektRaw) {
     if (_frageBeantwortet) return; // Verhindert Spam-Klicks
     HapticFeedback.selectionClick(); 
-    AudioService.instance.playClick(); 
     
     setState(() {
       _gewaehlteAntwortIndex = index; _frageBeantwortet = true;
@@ -377,6 +376,7 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
         AudioService.instance.playSuccess();
       } else { 
         _falscheAntworten++; 
+        AudioService.instance.playError(); // FEHLER-SOUND ABSPIELEN
       }
       _pruefeAvatarEinsatz(warRichtig);
     });
@@ -391,7 +391,8 @@ class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateM
       if (warRichtig) { 
         _richtigeAntworten++; _aktuelleXP += 15; HapticFeedback.mediumImpact(); AudioService.instance.playSuccess(); 
       } else { 
-        _falscheAntworten++; AudioService.instance.playError(); 
+        _falscheAntworten++; 
+        AudioService.instance.playError(); // FEHLER-SOUND ABSPIELEN
       } 
       _pruefeAvatarEinsatz(warRichtig); 
     });

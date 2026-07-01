@@ -4,85 +4,80 @@
 name: fachinformatiker_trainer
 description: "A new Flutter project."
 
-# Sicherheitsnetz: Verhindert, dass das Projekt versehentlich auf pub.dev 
-# (dem globalen Dart-Paket-Register) veröffentlicht wird. Wichtig für proprietäre 
-# Schul- und Firmenprojekte, um Quellcode-Leaks zu vermeiden.
-publish_to: 'none' 
+# Verhindert die Veröffentlichung auf pub.dev
+publish_to: "none"
 
-# Semantic Versioning (SemVer)
-# Format: MAJOR.MINOR.PATCH+BUILD
-# 1.0.0 ist die Versionsnummer, das +1 ist die interne Build-Nummer für den Compiler 
-# (wichtig, falls ihr später über CI/CD-Pipelines automatisiert neue Versionen baut).
+# Semantic Versioning
 version: 1.0.0+1
 
 # ==========================================
 # 2. UMGEBUNG (ENVIRONMENT)
 # ==========================================
-# Definiert die minimale Dart-SDK-Version.
-# Das Caret (^) bedeutet: "Kompatibel mit allen 3.x.x Versionen bis zur nächsten Major-Version 4.0.0".
 environment:
-  sdk: ^3.12.2
+  sdk: ">=3.9.0 <4.0.0"
 
 # ==========================================
-# 3. PRODUKTIV-ABHÄNGIGKEITEN (DEPENDENCIES)
-# Diese Pakete werden final in die fertige .exe oder .apk Datei einkompiliert.
+# 3. PRODUKTIV-ABHÄNGIGKEITEN
 # ==========================================
 dependencies:
-  # Das Kern-Framework
+  # Flutter
   flutter:
     sdk: flutter
 
-  # --- State Management & Architektur ---
-  # Riverpod ist unsere Lösung für Dependency Injection und reaktives State Management.
-  # Es trennt die UI strikt von der Geschäftslogik.
+  # State Management
   flutter_riverpod: ^2.5.1
-  
-  # --- Datenhaltung (Persistenz-Schicht) ---
-  # Die nativen SQLite-Bibliotheken
+
+  # Datenbank
   sqflite: ^2.4.1
-  # Der FFI-Treiber (Foreign Function Interface) zwingend nötig für Desktop-Support (Windows/Linux)
   sqflite_common_ffi: ^2.3.3
-  # Hilft beim sicheren, plattformunabhängigen Zusammenbauen von Dateipfaden (z.B. C:\ vs /usr/bin)
   path: ^1.9.0
-  # Lightweight Key-Value-Store für Nutzerpräferenzen (Sith/Jedi-Theme)
   shared_preferences: ^2.5.5
-  
-  # --- UI & Formatierung (Präsentations-Schicht) ---
-  # Für sauberes Datumsformat (z.B. für Spaced-Repetition-Berechnungen)
+
+  # UI
   intl: ^0.20.2
   cupertino_icons: ^1.0.8
   google_fonts: ^8.1.0
-  # Erlaubt das Zeichnen von komplexen Graphen (z.B. für das XP- und Fortschritts-Dashboard)
   fl_chart: ^1.2.0
-  
-  # --- Native System-Schnittstellen ---
-  # Erlaubt das Öffnen von nativen Datei-Dialogen (falls der Admin z.B. eigene JSONs importieren will)
+
+  # System
   file_selector: ^1.1.0
-  # Unsere Multi-Channel-Audio-Engine für asynchrone Soundeffekte
   audioplayers: ^6.8.0
 
 # ==========================================
-# 4. ENTWICKLER-ABHÄNGIGKEITEN (DEV_DEPENDENCIES)
-# Pakete, die NUR zur Entwicklungszeit gebraucht werden.
-# Sie landen NICHT in der finalen Release-App, was die Dateigröße drastisch reduziert.
+# 4. ENTWICKLER-ABHÄNGIGKEITEN
 # ==========================================
 dev_dependencies:
-  # Ermöglicht das Schreiben von automatisierten Unit- und Widget-Tests
   flutter_test:
     sdk: flutter
-  # Der strenge Dart-Linter. Er erzwingt Clean Code und warnt vor Architekturfehlern.
+
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.1
 
 # ==========================================
 # 5. FLUTTER-SPEZIFISCHE KONFIGURATION
 # ==========================================
 flutter:
   uses-material-design: true
-  
-  # --- ASSET BUNDLING ---
-  # Hier registrieren wir statische Dateien. 
-  # Durch den Trailing-Slash (/) am Ende wird der GESAMTE Ordner registriert.
-  # Der Compiler packt diese Dateien zur Laufzeit in ein geschütztes AssetBundle.
+
   assets:
-    - assets/          # Enthält z.B. die basis_fragen.json
-    - assets/sounds/   # Enthält die MP3s für den AudioService
+    - assets/
+    - assets/sounds/
+
+# ==========================================
+# 6. FLUTTER LAUNCHER ICONS
+# ==========================================
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  windows: 
+    generate: true
+    image_path: "assets/icon/app_icon.png"
+  macos:
+    generate: true
+    image_path: "assets/icon/app_icon.png"
+  linux:
+    generate: true
+    image_path: "assets/icon/app_icon.png"
+    
+  image_path: "assets/icon/app_icon.png"
+  min_sdk_android: 21
